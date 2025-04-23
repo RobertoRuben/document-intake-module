@@ -1,12 +1,12 @@
 import { Bell } from 'lucide-react';
-import { Button } from '../../../ui/button';
-import { Badge } from '../../../ui/badge';
+import { Button } from '@/modules/core/components/ui/button';
+import { Badge } from '@/modules/core/components/ui/badge';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '../../../ui/dropdown-menu';
+} from '@/modules/core/components/ui/dropdown-menu';
 import { NotificationMenuProps } from '../types/header.types';
 
 export const NotificationMenu = ({ 

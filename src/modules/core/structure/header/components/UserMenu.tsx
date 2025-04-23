@@ -1,11 +1,11 @@
 import { LogOut, User, UserCircle } from 'lucide-react';
-import { Button } from '../../../ui/button';
+import { Button } from '@/modules/core/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '../../../ui/dropdown-menu';
+} from '@/modules/core/components/ui/dropdown-menu';
 import { UserMenuProps } from '../types/header.types';
 
 export const UserMenu = ({ 
