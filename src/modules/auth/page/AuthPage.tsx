@@ -1,5 +1,5 @@
-import { Background } from "./components/Background";
-import { LoginCard } from "./components/LoginCard";
+import { Background } from "../components/Background.tsx";
+import { LoginCard } from "../components/LoginCard.tsx";
 import { Toaster } from "sonner";
 
 export const AuthPage = () => {
