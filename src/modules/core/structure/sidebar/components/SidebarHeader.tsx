@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import logo from '../../../assets/mda-logo.png';
+import logo from "@/assets/mda-logo.png";
 
 type SidebarHeaderProps = {
     onClose: () => void;
