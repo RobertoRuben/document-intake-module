@@ -1,44 +1,63 @@
-"use client";
-
 import { Menu } from 'lucide-react';
-import { HeaderProps } from './types/header.types';
 import { NotificationMenu } from './components/NotificationMenu';
 import { UserMenu } from './components/UserMenu';
+import { useHeaderDropdowns } from './hooks/useHeaderDropdowns';
+
+interface HeaderProps {
+  onOpenSidebar: () => void;
+  title: string;
+  notificationCount: number;
+  onViewNotifications: () => void;
+  onModalStateChange: (isOpen: boolean) => void;
+}
 
 export function Header({
-    onOpenSidebar,
-    title,
-    notificationCount,
-    onViewNotifications,
-    onModalStateChange,
+  onOpenSidebar,
+  title,
+  notificationCount,
+  onViewNotifications,
+  onModalStateChange
 }: HeaderProps) {
-    const handleProfileModalOpen = () => onModalStateChange(true);
-    const handleLogoutModalOpen = () => onModalStateChange(true);
+  const { openDropdown, toggleDropdown } = useHeaderDropdowns();
 
-    return (
-        <header className="bg-gradient-to-r from-black via-gray-900 to-black text-white py-4 px-6 shadow-md w-full">
-            <div className="flex items-center justify-between">
-                <button
-                    onClick={onOpenSidebar}
-                    className="lg:hidden mr-4 text-white hover:text-[#E0E0E0] transition-colors duration-200"
-                    aria-label="Abrir menú"
-                >
-                    <Menu className="h-6 w-6" />
-                </button>
-                <div className="flex-1 flex items-center">
-                    <span className="font-bold text-lg">{title}</span>
-                </div>
-                <div className="flex items-center space-x-4">
-                    <NotificationMenu 
-                        notificationCount={notificationCount}
-                        onViewNotifications={onViewNotifications}
-                    />
-                    <UserMenu 
-                        onOpenProfileModal={handleProfileModalOpen}
-                        onOpenLogoutModal={handleLogoutModalOpen}
-                    />
-                </div>
-            </div>
-        </header>
-    );
+  const handleOpenProfileModal = () => {
+    toggleDropdown(null);
+    onModalStateChange(true);
+    // Aquí podrías abrir el modal de perfil específico
+  };
+
+  const handleOpenLogoutModal = () => {
+    toggleDropdown(null);
+    onModalStateChange(true);
+    // Aquí podrías abrir el modal de logout específico
+  };
+
+  return (
+    <header className="bg-gradient-to-r from-black via-gray-900 to-black text-white px-4 py-3 shadow-md flex items-center justify-between">
+      <div className="flex items-center">
+        <button
+          onClick={onOpenSidebar}
+          className="lg:hidden mr-2"
+          aria-label="Abrir menú"
+        >
+          <Menu className="h-6 w-6" strokeWidth={3} />
+        </button>
+        <div className="text-xl font-medium">{title}</div>
+      </div>
+      <div className="flex items-center space-x-2">
+        <NotificationMenu 
+          notificationCount={notificationCount}
+          onViewNotifications={onViewNotifications}
+          openDropdown={openDropdown}
+          toggleDropdown={toggleDropdown}
+        />
+        <UserMenu 
+          onOpenProfileModal={handleOpenProfileModal}
+          onOpenLogoutModal={handleOpenLogoutModal}
+          openDropdown={openDropdown}
+          toggleDropdown={toggleDropdown}
+        />
+      </div>
+    </header>
+  );
 }

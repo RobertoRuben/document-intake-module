@@ -8,12 +8,18 @@ export type HeaderProps = {
     onModalStateChange: (isOpen: boolean) => void;
 };
 
-export type NotificationMenuProps = {
-    notificationCount: number;
-    onViewNotifications: () => void;
-};
+import { DropdownType } from '../hooks/useHeaderDropdowns';
 
-export type UserMenuProps = {
-    onOpenProfileModal: () => void;
-    onOpenLogoutModal: () => void;
-};
+export interface NotificationMenuProps {
+  notificationCount: number;
+  onViewNotifications: () => void;
+  openDropdown: DropdownType;
+  toggleDropdown: (dropdown: DropdownType) => void;
+}
+
+export interface UserMenuProps {
+  onOpenProfileModal: () => void;
+  onOpenLogoutModal: () => void;
+  openDropdown: DropdownType;
+  toggleDropdown: (dropdown: DropdownType) => void;
+}

@@ -10,10 +10,15 @@ import { UserMenuProps } from '../types/header.types';
 
 export const UserMenu = ({ 
     onOpenProfileModal, 
-    onOpenLogoutModal 
+    onOpenLogoutModal,
+    openDropdown,
+    toggleDropdown
 }: UserMenuProps) => {
     return (
-        <DropdownMenu>
+        <DropdownMenu
+            open={openDropdown === 'profile'}
+            onOpenChange={(open) => open ? toggleDropdown('profile') : toggleDropdown(null)}
+        >
             <DropdownMenuTrigger asChild>
                 <Button
                     size="icon"

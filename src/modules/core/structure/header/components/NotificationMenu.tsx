@@ -11,10 +11,15 @@ import { NotificationMenuProps } from '../types/header.types';
 
 export const NotificationMenu = ({ 
     notificationCount, 
-    onViewNotifications 
+    onViewNotifications,
+    openDropdown,
+    toggleDropdown
 }: NotificationMenuProps) => {
     return (
-        <DropdownMenu>
+        <DropdownMenu 
+            open={openDropdown === 'notifications'}
+            onOpenChange={(open) => open ? toggleDropdown('notifications') : toggleDropdown(null)}
+        >
             <DropdownMenuTrigger asChild>
                 <Button
                     size="icon"
