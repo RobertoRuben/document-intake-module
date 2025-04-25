@@ -5,6 +5,7 @@ import { PaginatedRolesResponseModel } from "@/modules/roles/models/role.page.mo
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { toast } from "sonner";
 
+
 export const useRoleContainerHook = () => {
     const [roles, setRoles] = useState<RoleModel[]>([]);
     const [paginationMeta, setPaginationMeta] = useState<PaginationMetaModel>({
@@ -28,11 +29,47 @@ export const useRoleContainerHook = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    // Ref para debouncing
     const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    
+    // Ref para prevenir llamadas duplicadas
+    const lastFetchParamsRef = useRef<{page: number, search: string} | null>(null);
+    
+    // Caché de datos por página y término de búsqueda
+    const pagesCache = useRef<Record<string, {
+        data: RoleModel[],
+        meta: PaginationMetaModel,
+        timestamp: number
+    }>>({});
+    
+    const CACHE_VALIDITY_TIME = 5 * 60 * 1000;
 
-    const fetchRoles = useCallback(async (page = currentPage, search = searchTerm) => {
+    const fetchRoles = useCallback(async (page = currentPage, search = searchTerm, forceRefresh = false) => {
+        const cacheKey = `${page}:${search}`;
+        
+        const cachedData = pagesCache.current[cacheKey];
+        const now = Date.now();
+        
+        if (!forceRefresh && cachedData && (now - cachedData.timestamp < CACHE_VALIDITY_TIME)) {
+            setRoles(cachedData.data);
+            setPaginationMeta(cachedData.meta);
+            setIsLoading(false);
+            return;
+        }
+        
+        const fetchParams = { page, search };
+        if (!forceRefresh && lastFetchParamsRef.current && 
+            lastFetchParamsRef.current.page === page && 
+            lastFetchParamsRef.current.search === search) {
+            return;
+        }
+        
+        lastFetchParamsRef.current = fetchParams;
+        
+        
         setIsLoading(true);
         setError(null);
+        
         try {
             let response: PaginatedRolesResponseModel;
 
@@ -43,6 +80,12 @@ export const useRoleContainerHook = () => {
             }
 
             if (response && response.data) {
+                pagesCache.current[cacheKey] = {
+                    data: response.data,
+                    meta: response.meta,
+                    timestamp: now
+                };
+                
                 setRoles(response.data);
 
                 if (response.meta) {
@@ -54,7 +97,6 @@ export const useRoleContainerHook = () => {
                 setRoles([]);
             }
         } catch (err) {
-            console.error("Error al cargar roles:", err);
             const errorMessage = err instanceof Error ? err.message : "Error al cargar los roles";
             setError(errorMessage);
             toast.error("Error", {
@@ -66,14 +108,28 @@ export const useRoleContainerHook = () => {
         }
     }, []);
 
+    const invalidateCache = useCallback(() => {
+        pagesCache.current = {};
+    }, []);
+
     useEffect(() => {
         fetchRoles(1, "");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
+        
         if (fetchTimeoutRef.current) {
             clearTimeout(fetchTimeoutRef.current);
+        }
+
+        const cacheKey = `${currentPage}:${searchTerm}`;
+        const cachedData = pagesCache.current[cacheKey];
+        const now = Date.now();
+        
+        if (cachedData && (now - cachedData.timestamp < CACHE_VALIDITY_TIME)) {
+            setRoles(cachedData.data);
+            setPaginationMeta(cachedData.meta);
         }
 
         fetchTimeoutRef.current = setTimeout(() => {
@@ -111,12 +167,15 @@ export const useRoleContainerHook = () => {
     const handleConfirmDelete = useCallback(async () => {
         if (roleToDelete?.id) {
             setIsLoading(true);
+            
             try {
                 await roleService.deleteRole(roleToDelete.id);
                 toast.success("Rol eliminado", {
                     description: "El rol ha sido eliminado correctamente"
                 });
-                fetchRoles(currentPage, searchTerm);
+                
+                invalidateCache();
+                fetchRoles(currentPage, searchTerm, true);
             } catch (err) {
                 const errorMessage = err instanceof Error ? err.message : "Error al eliminar el rol";
                 setError(errorMessage);
@@ -129,7 +188,7 @@ export const useRoleContainerHook = () => {
                 setRoleToDelete(undefined);
             }
         }
-    }, [roleToDelete, currentPage, searchTerm, fetchRoles]);
+    }, [roleToDelete, currentPage, searchTerm, fetchRoles, invalidateCache]);
 
     const handleCancelDelete = useCallback(() => {
         setIsDeleteModalOpen(false);
@@ -143,6 +202,7 @@ export const useRoleContainerHook = () => {
 
     const handleSubmitRole = useCallback(async (data: RoleModel) => {
         setIsLoading(true);
+        
         try {
             if (data.id) {
                 await roleService.updateRole(data.id, data);
@@ -155,7 +215,10 @@ export const useRoleContainerHook = () => {
                     description: "El rol ha sido creado correctamente"
                 });
             }
-            fetchRoles(currentPage, searchTerm);
+            
+            invalidateCache();
+            
+            fetchRoles(currentPage, searchTerm, true);
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Error al guardar el rol";
             setError(errorMessage);
@@ -166,16 +229,76 @@ export const useRoleContainerHook = () => {
             setIsLoading(false);
             setIsModalOpen(false);
         }
-    }, [currentPage, searchTerm, fetchRoles]);
+    }, [currentPage, searchTerm, fetchRoles, invalidateCache]);
 
     const handleSearchChange = useCallback((value: string) => {
         setSearchTerm(value);
-        setCurrentPage(1);
+        setCurrentPage(1); 
     }, []);
 
     const handlePageChange = useCallback((page: number) => {
+        const cacheKey = `${page}:${searchTerm}`;
+        const cachedData = pagesCache.current[cacheKey];
+        const now = Date.now();
+        
+        if (cachedData && (now - cachedData.timestamp < CACHE_VALIDITY_TIME)) {
+            setRoles(cachedData.data);
+            setPaginationMeta(prev => ({
+                ...prev,
+                currentPage: page
+            }));
+        }
+        
         setCurrentPage(page);
-    }, []);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        return () => {
+        };
+    }, [dataVersion]);
+
+    useEffect(() => {
+        if (paginationMeta && paginationMeta.totalPages > 1) {
+            const pagesToPreload: number[] = [];
+        
+            if (paginationMeta.nextPage) {
+                pagesToPreload.push(paginationMeta.nextPage);
+            }
+            
+            if (pagesToPreload.length > 0) {
+                const preloadTimer = setTimeout(() => {
+                    pagesToPreload.forEach(page => {
+                        const cacheKey = `${page}:${searchTerm}`;
+                        if (!pagesCache.current[cacheKey]) {
+                            (async () => {
+                                try {
+                                    if (searchTerm) {
+                                        const response = await roleService.searchRoles(searchTerm, page);
+                                        pagesCache.current[cacheKey] = {
+                                            data: response.data,
+                                            meta: response.meta,
+                                            timestamp: Date.now()
+                                        };
+                                    } else {
+                                        const response = await roleService.getPaginatedRoles(page);
+                                        pagesCache.current[cacheKey] = {
+                                            data: response.data,
+                                            meta: response.meta,
+                                            timestamp: Date.now()
+                                        };
+                                    }
+                                } catch (err) {
+                                    console.log(`Error: `, err);
+                                }
+                            })();
+                        }
+                    });
+                }, 1000); 
+                
+                return () => clearTimeout(preloadTimer);
+            }
+        }
+    }, [paginationMeta, searchTerm]);
 
     return {
         roles,
