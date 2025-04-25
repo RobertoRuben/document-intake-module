@@ -1,6 +1,6 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthHook } from '../hooks/use-auth.hook.ts';
 import { AuthModelResponse } from '../models/auth.model.response.ts';
 
 interface AuthContextType {
@@ -17,7 +17,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const { login, logout, isAuthenticated } = useAuth();
+    const { login, logout, isAuthenticated } = useAuthHook();
     const [checkingAuth, setCheckingAuth] = useState(true);
     const navigate = useNavigate();
 

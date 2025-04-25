@@ -1,7 +1,7 @@
 import { BrowserRouter } from "react-router-dom";
 import { LoadingSpinnerProvider } from "./modules/core/structure/loading-spinner/providers/LoadingSpinnerProvider";
 import { AppRouter } from "./modules/routes/AppRouter";
-import { AuthProvider } from "./modules/auth/context/AuthContext";
+import { AuthProvider } from "./modules/auth/context/auth.context.tsx";
 import {Toaster} from "sonner";
 
 function App() {

@@ -3,7 +3,7 @@ import { authService } from '../services/auth.service.ts';
 import { AuthModelResponse } from '../models/auth.model.response.ts';
 import useLoadingSpinner from "@/modules/core/structure/loading-spinner/hooks/useLoadingSpinner.ts";
 
-export const useAuth = () => {
+export const useAuthHook = () => {
     const [authData, setAuthData] = useState<AuthModelResponse | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(authService.isAuthenticated());
     const { showLoading, hideLoading } = useLoadingSpinner();

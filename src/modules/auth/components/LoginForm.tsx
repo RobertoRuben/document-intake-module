@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { useLoginForm } from "../hooks/useLoginForm";
+import { useLoginFormHook } from "../hooks/use-login-form.hook.ts";
 import { UsernameInput } from "./login-form/UsernameInput";
 import { PasswordInput } from "./login-form/PasswordInput";
 import { SubmitButton } from "./login-form/SubmitButton";
 
 export const LoginForm = () => {
-  const { credentials, isLoading, handleChange, handleSubmit } = useLoginForm();
+  const { credentials, isLoading, handleChange, handleSubmit } = useLoginFormHook();
 
   const formVariants = {
     hidden: { opacity: 0, y: 20 },
