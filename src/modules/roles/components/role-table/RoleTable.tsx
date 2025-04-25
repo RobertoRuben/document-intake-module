@@ -1,0 +1,155 @@
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+    useReactTable,
+    getCoreRowModel,
+    getSortedRowModel,
+    getFilteredRowModel,
+    flexRender
+} from "@tanstack/react-table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/modules/core/components/ui/table";
+import { EmptyRoleMessage } from "./EmptyRoleMessage";
+import { RoleSearchInput} from "./RoleSearchInput";
+import { ColumnVisibilityDropdown} from "./ColumnVisibilityDropdown";
+import { TablePagination} from "./TablePagination";
+import { useRoleTableContext } from "@/modules/roles/context/role-table.context";
+import { RoleModel } from "@/modules/roles/models/role.model";
+import { PaginationMetaModel } from "@/globals/models/pagination.model";
+
+interface ExtendedRoleTableContext extends ReturnType<typeof useRoleTableContext> {
+    roles: RoleModel[];
+    paginationMeta: PaginationMetaModel;
+}
+
+export const RoleTable: React.FC = () => {
+    const {
+        sorting,
+        setSorting,
+        columnFilters,
+        setColumnFilters,
+        columnVisibility,
+        setColumnVisibility,
+        rowSelection,
+        setRowSelection,
+        pagination,
+        setPagination,
+        columns,
+        tableVariants,
+        dataVersion,
+        searchTerm,
+        onSearchChange
+    } = useRoleTableContext();
+
+    const context = useRoleTableContext() as ExtendedRoleTableContext;
+    const { roles, paginationMeta } = context;
+
+    const table = useReactTable({
+        data: roles || [],
+        columns,
+        state: {
+            sorting,
+            columnFilters,
+            columnVisibility,
+            rowSelection,
+            pagination,
+        },
+        enableRowSelection: true,
+        onRowSelectionChange: setRowSelection,
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        onColumnVisibilityChange: setColumnVisibility,
+        onPaginationChange: setPagination,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        manualPagination: true,
+        pageCount: paginationMeta?.totalPages || 0,
+    });
+
+    return (
+        <div className="w-full">
+            <div className="flex items-center justify-between py-4">
+                <RoleSearchInput
+                    value={searchTerm}
+                    onChange={onSearchChange}
+                />
+                <ColumnVisibilityDropdown
+                    columns={table.getAllColumns().map((column) => ({
+                        id: column.id,
+                        isVisible: column.getIsVisible(),
+                        toggleVisibility: (value) => column.toggleVisibility(value),
+                        getCanHide: () => column.getCanHide(),
+                    }))}
+                />
+            </div>
+
+            <div className="overflow-x-auto rounded-md border">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={`${pagination.pageIndex}-${dataVersion}-${searchTerm}`}
+                        variants={tableVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        transition={{ duration: 0.3 }}
+                        className="w-full"
+                    >
+                        <Table>
+                            <TableHeader>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id} className="bg-[#145A32] hover:bg-[#0E3D22]">
+                                        {headerGroup.headers.map((header) => (
+                                            <TableHead
+                                                key={header.id}
+                                                className="text-white"
+                                            >
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext()
+                                                    )}
+                                            </TableHead>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {table.getRowModel().rows?.length ? (
+                                    table.getRowModel().rows.map((row, index) => (
+                                        <TableRow
+                                            key={row.id}
+                                            className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100`}
+                                            data-state={row.getIsSelected() && "selected"}
+                                        >
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={columns.length} className="h-24">
+                                            <EmptyRoleMessage />
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </motion.div>
+                </AnimatePresence>
+            </div>
+
+            <TablePagination
+                currentPage={table.getState().pagination.pageIndex}
+                totalPages={paginationMeta?.totalPages || 0}
+                totalItems={paginationMeta?.total || 0}
+                pageSize={paginationMeta?.perPage || 10}
+                selectedCount={table.getFilteredSelectedRowModel().rows.length}
+                onPageChange={(page) => table.setPageIndex(page)}
+            />
+        </div>
+    );
+};
