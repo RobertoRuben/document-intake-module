@@ -1,4 +1,3 @@
-// src/modules/routes/app.router.tsx
 import {Navigate, Route, Routes} from "react-router-dom";
 import { Layout } from "@/modules/core/structure/layout/Layout";
 import { AuthRoutes } from "@/modules/auth/routes/auth.routes.tsx";
