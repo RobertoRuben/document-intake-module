@@ -15,7 +15,7 @@ export default function ContentHeader() {
   return (
     <div className="bg-white mb-6 p-4 rounded-lg shadow-sm">
       <div className="flex flex-wrap items-center">
-        <h1 className="text-xl font-semibold text-gray-800">
+        <h1 className="text-xl font-semibold text-gray-500">
           {pageTitle}
         </h1>
       </div>
