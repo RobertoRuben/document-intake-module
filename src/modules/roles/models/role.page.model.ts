@@ -1,4 +1,8 @@
-import {PaginatedResponseModel} from "@/globals/models/pagination.model";
-import {RoleModel} from "@/modules/roles/models/role.model";
+// src/modules/roles/models/role.page.model.ts
+import { RoleModel } from "@/modules/roles/models/role.model";
+import { PaginationMetaModel } from "@/globals/models/pagination.model";
 
-export type PaginatedRolesResponseModel = PaginatedResponseModel<RoleModel>;
+export interface PaginatedRolesResponseModel {
+    data: RoleModel[];
+    meta: PaginationMetaModel;
+}
