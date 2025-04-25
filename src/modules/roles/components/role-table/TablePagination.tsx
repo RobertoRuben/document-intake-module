@@ -46,8 +46,9 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
                     disabled={currentPage === 0}
                     className="flex items-center"
                 >
-                    <ChevronLeft className="h-4 w-4 mr-1" />
-                    <span>Anterior</span>
+                    <ChevronLeft className="h-4 w-4" />
+                    {/* Texto visible solo en pantallas md y superiores */}
+                    <span className="ml-1 hidden md:inline">Anterior</span>
                 </Button>
                 <Button
                     variant="outline"
@@ -61,8 +62,9 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
                     disabled={currentPage >= totalPages - 1}
                     className="flex items-center"
                 >
-                    <span>Siguiente</span>
-                    <ChevronRight className="h-4 w-4 ml-1" />
+                    {/* Texto visible solo en pantallas md y superiores */}
+                    <span className="mr-1 hidden md:inline">Siguiente</span>
+                    <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>
         </div>
