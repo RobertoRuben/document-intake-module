@@ -1,22 +1,47 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
     useReactTable,
     getCoreRowModel,
     getSortedRowModel,
     getFilteredRowModel,
-    flexRender
+    flexRender,
+    ColumnDef,
+    SortingState,
+    ColumnFiltersState,
+    VisibilityState,
+    RowSelectionState,
+    PaginationState,
+    OnChangeFn
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/modules/core/components/ui/table";
 import { EmptyRoleMessage } from "./EmptyRoleMessage";
-import { RoleSearchInput} from "./RoleSearchInput";
-import { ColumnVisibilityDropdown} from "./ColumnVisibilityDropdown";
-import { TablePagination} from "./TablePagination";
+import { RoleSearchInput } from "./RoleSearchInput";
+import { ColumnVisibilityDropdown } from "./ColumnVisibilityDropdown";
+import { TablePagination } from "./TablePagination";
 import { useRoleTableContext } from "@/modules/roles/context/role-table.context";
 import { RoleModel } from "@/modules/roles/models/role.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 
-interface ExtendedRoleTableContext extends ReturnType<typeof useRoleTableContext> {
+interface RoleTableContextType {
+    sorting: SortingState;
+    setSorting: OnChangeFn<SortingState>;
+    columnFilters: ColumnFiltersState;
+    setColumnFilters: OnChangeFn<ColumnFiltersState>;
+    columnVisibility: VisibilityState;
+    setColumnVisibility: OnChangeFn<VisibilityState>;
+    rowSelection: RowSelectionState;
+    setRowSelection: OnChangeFn<RowSelectionState>;
+    pagination: PaginationState;
+    setPagination: OnChangeFn<PaginationState>;
+    columns: ColumnDef<RoleModel, unknown>[];
+    tableVariants: Variants;
+    dataVersion: number;
+    searchTerm: string;
+    onSearchChange: (value: string) => void;
+}
+
+interface ExtendedRoleTableContext extends RoleTableContextType {
     roles: RoleModel[];
     paginationMeta: PaginationMetaModel;
 }
@@ -38,9 +63,9 @@ export const RoleTable: React.FC = () => {
         dataVersion,
         searchTerm,
         onSearchChange
-    } = useRoleTableContext();
+    } = useRoleTableContext() as unknown as RoleTableContextType;
 
-    const context = useRoleTableContext() as ExtendedRoleTableContext;
+    const context = useRoleTableContext() as unknown as ExtendedRoleTableContext;
     const { roles, paginationMeta } = context;
 
     console.log("RoleTable - roles recibidos:", roles);
@@ -61,7 +86,13 @@ export const RoleTable: React.FC = () => {
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         onColumnVisibilityChange: setColumnVisibility,
-        onPaginationChange: setPagination,
+        onPaginationChange: (updaterOrValue) => {
+            const newPagination = typeof updaterOrValue === 'function'
+                ? updaterOrValue(pagination)
+                : updaterOrValue;
+
+            setPagination(newPagination);
+        },
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
