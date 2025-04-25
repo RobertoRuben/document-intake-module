@@ -99,11 +99,14 @@ export const RoleTable: React.FC = () => {
 
     return (
         <div className="w-full">
-            <div className="flex items-center justify-between py-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
+            <div className="w-full md:w-auto">
                 <RoleSearchInput
                     value={searchTerm}
                     onChange={onSearchChange}
                 />
+            </div>
+            <div className="w-full md:w-auto">
                 <ColumnVisibilityDropdown
                     columns={table.getAllColumns().map((column) => ({
                         id: column.id,
@@ -113,6 +116,7 @@ export const RoleTable: React.FC = () => {
                     }))}
                 />
             </div>
+        </div>
 
             <div className="overflow-x-auto rounded-md border">
                 <AnimatePresence mode="wait">
