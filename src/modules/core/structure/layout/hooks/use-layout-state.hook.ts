@@ -16,18 +16,13 @@ export function useLayoutStateHook() {
     navigate("/notificaciones");
   };
 
-  const excludedRoutes = ["/inicio", "/dashboard"];
-  const shouldShowContentHeader = !excludedRoutes.some((route) =>
-    location.pathname.startsWith(route)
-  );
-
   useEffect(() => {
     showLoading();
-    
+
     const timer = setTimeout(() => {
       hideLoading();
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, [location.pathname, showLoading, hideLoading]);
 
@@ -44,7 +39,6 @@ export function useLayoutStateHook() {
     setUnconfirmedCount,
     isLoading,
     handleViewNotifications,
-    shouldShowContentHeader,
     headerTitle
   };
 }

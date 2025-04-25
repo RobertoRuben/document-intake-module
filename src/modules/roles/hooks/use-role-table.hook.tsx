@@ -41,9 +41,11 @@ export const useRoleTable = ({
         updatedAt: false,
     });
     const [rowSelection, setRowSelection] = useState({});
+
+    // Inicializar la paginación usando currentPage-1 para convertir de base-1 a base-0
     const [pagination, setPagination] = useState({
-        pageIndex: paginationMeta.currentPage - 1,
-        pageSize: paginationMeta.perPage,
+        pageIndex: (paginationMeta?.currentPage || 1) - 1,
+        pageSize: paginationMeta?.perPage || 10,
     });
 
     const columns = useMemo<ColumnDef<RoleModel>[]>(
@@ -144,6 +146,7 @@ export const useRoleTable = ({
         [onEdit, onDelete]
     );
 
+    // Actualizar filtros cuando cambie el término de búsqueda
     useEffect(() => {
         if (searchTerm) {
             setColumnFilters([{ id: "name", value: searchTerm }]);
@@ -152,20 +155,26 @@ export const useRoleTable = ({
         }
     }, [searchTerm]);
 
+    // Sincronización unidireccional: desde backend a estado local
+    // Solo actualizar cuando cambie la página del backend
     useEffect(() => {
-        if (pagination.pageIndex !== paginationMeta.currentPage - 1) {
-            setPagination({
-                ...pagination,
-                pageIndex: paginationMeta.currentPage - 1
-            });
+        const backendPageIndex = (paginationMeta?.currentPage || 1) - 1;
+        if (pagination.pageIndex !== backendPageIndex) {
+            setPagination(prev => ({
+                ...prev,
+                pageIndex: backendPageIndex
+            }));
         }
-    }, [paginationMeta.currentPage, pagination]);
+    }, [paginationMeta?.currentPage]);
 
-    useEffect(() => {
-        if (pagination.pageIndex !== paginationMeta.currentPage - 1) {
-            onPageChange(pagination.pageIndex + 1);
+    // Manejar cambios de página iniciados por el usuario
+    const handlePaginationChange = (updatedPagination: typeof pagination) => {
+        setPagination(updatedPagination);
+        // Convertir de base-0 a base-1 para el backend
+        if (updatedPagination.pageIndex !== pagination.pageIndex) {
+            onPageChange(updatedPagination.pageIndex + 1);
         }
-    }, [pagination.pageIndex, onPageChange, paginationMeta.currentPage]);
+    };
 
     const tableVariants = {
         initial: { opacity: 0, scale: 0.95 },
@@ -183,7 +192,7 @@ export const useRoleTable = ({
         rowSelection,
         setRowSelection,
         pagination,
-        setPagination,
+        setPagination: handlePaginationChange,
         columns,
         tableVariants,
         isEmpty: roles.length === 0,
