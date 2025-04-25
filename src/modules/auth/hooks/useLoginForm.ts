@@ -2,23 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AuthModelRequest } from "../models/authModelRequest";
-
-const useAuth = () => {
-  const login = async (username: string, password: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (username && password) {
-          localStorage.setItem('isAuthenticated', 'true');
-          resolve();
-        } else {
-          reject(new Error('Credenciales inválidas'));
-        }
-      }, 1000);
-    });
-  };
-
-  return { login };
-};
+import { useAuthContext } from "../context/AuthContext";
 
 export const useLoginForm = () => {
   const [credentials, setCredentials] = useState<AuthModelRequest>({
@@ -27,7 +11,7 @@ export const useLoginForm = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login } = useAuthContext();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,7 +43,7 @@ export const useLoginForm = () => {
       console.error("Error al iniciar sesión:", err);
       toast.error("Error de autenticación", {
         description: "Las credenciales ingresadas son incorrectas o falló la conexión."
-      });
+      })
     }
 
     setIsLoading(false);
