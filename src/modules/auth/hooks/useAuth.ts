@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { authService } from '../services/auth.service.ts';
-import { AuthModelResponse } from '../models/authModelResponse';
+import { AuthModelResponse } from '../models/auth.model.response.ts';
 import useLoadingSpinner from "@/modules/core/structure/loading-spinner/hooks/useLoadingSpinner.ts";
 
 export const useAuth = () => {

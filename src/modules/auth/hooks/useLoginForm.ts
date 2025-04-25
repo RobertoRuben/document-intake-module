@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { AuthModelRequest } from "../models/authModelRequest";
+import { AuthModelRequest } from "../models/auth.model.request.ts";
 import { useAuthContext } from "../context/AuthContext";
 
 export const useLoginForm = () => {
