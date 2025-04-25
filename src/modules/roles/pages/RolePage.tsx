@@ -1,8 +1,12 @@
-import React from "react";
-import { RoleContainer} from "@/modules/roles/components/role-container/RoleContainer.tsx";
+import { RoleProvider } from "@/modules/roles/context/role.context";
+import { RoleContainer } from "@/modules/roles/components/role-container/RoleContainer";
 
-const RolePage: React.FC = () => {
-    return <RoleContainer />;
+const RolesPage = () => {
+    return (
+        <RoleProvider>
+            <RoleContainer />
+        </RoleProvider>
+    );
 };
 
-export default RolePage;
+export default RolesPage;
