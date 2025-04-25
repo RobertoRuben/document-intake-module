@@ -1,11 +1,20 @@
-import { Button } from "./modules/core/components/ui/button"
+import { BrowserRouter } from "react-router-dom";
+import { LoadingSpinnerProvider } from "./modules/core/structure/loading-spinner/providers/loading-spinner.provider.tsx";
+import { AppRouter } from "./modules/routes/app.router.tsx";
+import { AuthProvider } from "./modules/auth/context/auth.context.tsx";
+import {Toaster} from "sonner";
 
 function App() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
-      <Button>Click me</Button>
-    </div>
-  )
+    return (
+        <LoadingSpinnerProvider>
+            <BrowserRouter>
+                <AuthProvider>
+                    <AppRouter />
+                    <Toaster position="top-right" richColors />
+                </AuthProvider>
+            </BrowserRouter>
+        </LoadingSpinnerProvider>
+    );
 }
 
-export default App
+export default App;
