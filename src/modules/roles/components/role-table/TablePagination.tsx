@@ -37,7 +37,12 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => onPageChange(currentPage - 1)}
+                    onClick={() => {
+                        const newPage = currentPage - 1;
+                        if (newPage >= 0) {
+                            onPageChange(newPage);
+                        }
+                    }}
                     disabled={currentPage === 0}
                 >
                     <ChevronLeft className="h-4 w-4 mr-1" />
@@ -46,7 +51,12 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => onPageChange(currentPage + 1)}
+                    onClick={() => {
+                        const newPage = currentPage + 1;
+                        if (newPage < totalPages) {
+                            onPageChange(newPage);
+                        }
+                    }}
                     disabled={currentPage >= totalPages - 1}
                 >
                     Siguiente
