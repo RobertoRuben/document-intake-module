@@ -1,4 +1,4 @@
-import axiosInstance from "../../globals/axios-config";
+import axiosInstance from "../../../globals/config/axios-config.ts";
 import { AuthRequestModel } from "../models/auth.request.model.ts";
 import { AuthResponseModel } from "../models/auth.response.model.ts";
 import { camelizeKeys, decamelizeKeys } from "humps";
