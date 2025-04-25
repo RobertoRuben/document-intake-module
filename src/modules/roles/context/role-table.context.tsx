@@ -1,14 +1,8 @@
 import React, { createContext, useContext, ReactNode } from "react";
-import {
-    SortingState,
-    ColumnFiltersState,
-    VisibilityState,
-    ColumnDef
-} from "@tanstack/react-table";
 import { useRoleTable } from "../hooks/use-role-table.hook";
-import { useRoleContainerHook } from "../hooks/use-role-container.hook";
+import { useRoleContext } from "./role.context";
 import { RoleModel } from "../models/role.model";
-import { PaginationMetaModel } from "@/globals/models/pagination.model";
+import { PaginationMetaModel } from "@/globals/models/pagination.model.ts";
 
 interface RoleTableContextType {
     roles: RoleModel[];
@@ -17,33 +11,16 @@ interface RoleTableContextType {
     currentPage: number;
     searchTerm: string;
     isLoading: boolean;
-    sorting: SortingState;
-    setSorting: React.Dispatch<React.SetStateAction<SortingState>>;
-    columnFilters: ColumnFiltersState;
-    setColumnFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
-    columnVisibility: VisibilityState;
-    setColumnVisibility: React.Dispatch<React.SetStateAction<VisibilityState>>;
-    rowSelection: Record<string, boolean>;
-    setRowSelection: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-    pagination: { pageIndex: number; pageSize: number };
-    setPagination: (updatedPagination: { pageIndex: number; pageSize: number }) => void;
-    columns: ColumnDef<RoleModel>[];
-    tableVariants: {
-        initial: { opacity: number; scale: number };
-        animate: { opacity: number; scale: number };
-        exit: { opacity: number; scale: number };
-    };
-    isEmpty: boolean;
-    onSearchChange: (value: string) => void;
-    onPageChange: (page: number) => void;
     onEdit: (id?: number) => void;
     onDelete: (id?: number) => void;
+    onSearchChange: (searchTerm: string) => void;
+    onPageChange: (page: number) => void;
+    [key: string]: unknown;
 }
 
 const RoleTableContext = createContext<RoleTableContextType | undefined>(undefined);
 
 export const RoleTableProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const containerHook = useRoleContainerHook();
     const {
         roles,
         paginationMeta,
@@ -55,26 +32,9 @@ export const RoleTableProvider: React.FC<{ children: ReactNode }> = ({ children 
         handleDeleteRole: onDelete,
         handleSearchChange: onSearchChange,
         handlePageChange: onPageChange
-    } = containerHook;
+    } = useRoleContext();
 
-    console.log("RoleTableProvider - roles:", roles);
-    console.log("RoleTableProvider - paginationMeta:", paginationMeta);
-
-    const {
-        sorting,
-        setSorting,
-        columnFilters,
-        setColumnFilters,
-        columnVisibility,
-        setColumnVisibility,
-        rowSelection,
-        setRowSelection,
-        pagination,
-        setPagination,
-        columns,
-        tableVariants,
-        isEmpty
-    } = useRoleTable({
+    const tableHookProps = useRoleTable({
         roles,
         dataVersion,
         paginationMeta,
@@ -84,6 +44,9 @@ export const RoleTableProvider: React.FC<{ children: ReactNode }> = ({ children 
         onSearchChange,
         onPageChange
     });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { dataVersion: dataVersionDup, searchTerm: searchTermDup, onSearchChange: onSearchChangeDup, ...restTableHookProps } = tableHookProps;
 
     const value: RoleTableContextType = {
         roles,
@@ -96,19 +59,7 @@ export const RoleTableProvider: React.FC<{ children: ReactNode }> = ({ children 
         onDelete,
         onSearchChange,
         onPageChange,
-        sorting,
-        setSorting,
-        columnFilters,
-        setColumnFilters,
-        columnVisibility,
-        setColumnVisibility,
-        rowSelection,
-        setRowSelection,
-        pagination,
-        setPagination,
-        columns,
-        tableVariants,
-        isEmpty
+        ...restTableHookProps
     };
 
     return (
