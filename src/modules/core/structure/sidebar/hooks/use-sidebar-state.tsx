@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { navItems } from '../config/SidebarConfig';
+import { navItems } from '../config/sidebar-config.ts';
 import { NavItem, NavSubItem } from '../types/sidebar.types';
 
 export function useSidebarState(unconfirmedCount = 0) {

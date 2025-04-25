@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { authService } from '../services/auth.service.ts';
 import { AuthModelResponse } from '../models/auth.model.response.ts';
-import useLoadingSpinner from "@/modules/core/structure/loading-spinner/hooks/useLoadingSpinner.ts";
+import useLoadingSpinnerHook from "@/modules/core/structure/loading-spinner/hooks/use-loading-spinner.hook.ts";
 
 export const useAuthHook = () => {
     const [authData, setAuthData] = useState<AuthModelResponse | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(authService.isAuthenticated());
-    const { showLoading, hideLoading } = useLoadingSpinner();
+    const { showLoading, hideLoading } = useLoadingSpinnerHook();
 
     const login = async (username: string, password: string): Promise<AuthModelResponse> => {
         showLoading();

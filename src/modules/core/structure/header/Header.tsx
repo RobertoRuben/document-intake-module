@@ -1,7 +1,7 @@
 import { Menu } from 'lucide-react';
 import { NotificationMenu } from './components/NotificationMenu';
 import { UserMenu } from './components/UserMenu';
-import { useHeaderDropdowns } from './hooks/useHeaderDropdowns';
+import { useHeaderDropdownsHook } from './hooks/use-header-dropdowns.hook.ts';
 
 interface HeaderProps {
   onOpenSidebar: () => void;
@@ -18,7 +18,7 @@ export function Header({
   onViewNotifications,
   onModalStateChange
 }: HeaderProps) {
-  const { openDropdown, toggleDropdown } = useHeaderDropdowns();
+  const { openDropdown, toggleDropdown } = useHeaderDropdownsHook();
 
   const handleOpenProfileModal = () => {
     toggleDropdown(null);

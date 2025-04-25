@@ -8,7 +8,7 @@ export type HeaderProps = {
     onModalStateChange: (isOpen: boolean) => void;
 };
 
-import { DropdownType } from '../hooks/useHeaderDropdowns';
+import { DropdownType } from '../hooks/use-header-dropdowns.hook.ts';
 
 export interface NotificationMenuProps {
   notificationCount: number;

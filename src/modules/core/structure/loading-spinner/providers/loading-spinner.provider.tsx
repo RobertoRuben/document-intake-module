@@ -1,13 +1,13 @@
 import { ReactNode } from 'react';
-import useLoadingSpinner from '../hooks/useLoadingSpinner';
-import { LoadingSpinnerContext } from '../context/LoadingSpinnerContext';
+import useLoadingSpinnerHook from '../hooks/use-loading-spinner.hook.ts';
+import { LoadingSpinnerContext } from '../context/loading-spinner.context.tsx';
 
 interface LoadingSpinnerProviderProps {
   children: ReactNode;
 }
 
 export function LoadingSpinnerProvider({ children }: LoadingSpinnerProviderProps) {
-  const loadingSpinnerValues = useLoadingSpinner();
+  const loadingSpinnerValues = useLoadingSpinnerHook();
 
   return (
     <LoadingSpinnerContext.Provider value={loadingSpinnerValues}>

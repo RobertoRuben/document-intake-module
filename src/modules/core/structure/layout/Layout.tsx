@@ -2,7 +2,7 @@
 
 import { Outlet } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLayoutState } from "./hooks/useLayoutState";
+import { useLayoutStateHook } from "./hooks/use-layout-state.hook.ts";
 import { Sidebar } from "../sidebar/Sidebar";
 import { Header } from "../header/Header";
 import { MainContent } from "../main-content/MainContent";
@@ -22,7 +22,7 @@ export function Layout() {
     handleViewNotifications,
     shouldShowContentHeader,
     headerTitle
-  } = useLayoutState();
+  } = useLayoutStateHook();
 
   return (
     <div

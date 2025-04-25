@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 export type DropdownType = 'notifications' | 'profile' | null;
 
-export function useHeaderDropdowns() {
+export function useHeaderDropdownsHook() {
   const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
   
   const toggleDropdown = (dropdown: DropdownType) => {

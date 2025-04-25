@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useLoadingSpinnerContext } from "../../loading-spinner/hooks/useLoadingSpinnerContext";
+import { useLoadingSpinnerContextHook } from "../../loading-spinner/hooks/use-loading-spinner-context.hook.ts";
 
-export function useLayoutState() {
+export function useLayoutStateHook() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -10,7 +10,7 @@ export function useLayoutState() {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const { isLoading, showLoading, hideLoading } = useLoadingSpinnerContext();
+  const { isLoading, showLoading, hideLoading } = useLoadingSpinnerContextHook();
 
   const handleViewNotifications = () => {
     navigate("/notificaciones");

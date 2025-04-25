@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-export default function useLoadingSpinner() {
+export default function useLoadingSpinnerHook() {
     const [isLoading, setIsLoading] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState('Cargando...');
 

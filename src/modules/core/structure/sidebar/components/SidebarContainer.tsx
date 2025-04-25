@@ -1,7 +1,7 @@
 import { SidebarProps } from '../types/sidebar.types';
 import { SidebarHeader } from './SidebarHeader';
 import { SidebarNavigation } from './SidebarNavigation';
-import { useSidebarState } from '../hooks/useSidebarState';
+import { useSidebarState } from '../hooks/use-sidebar-state.tsx';
 
 export function SidebarContainer({ isOpen, onClose, unconfirmedCount = 0 }: SidebarProps) {
     const { openMenus, toggleMenu, filteredNavItems, getFilteredSubItems } = useSidebarState(unconfirmedCount);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export const useHeaderState = (onModalStateChange: (isOpen: boolean) => void) => {
+export const useHeaderStateHook = (onModalStateChange: (isOpen: boolean) => void) => {
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
