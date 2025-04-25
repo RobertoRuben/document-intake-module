@@ -145,7 +145,6 @@ export const useRoleTable = ({
         [onEdit, onDelete]
     );
 
-    // Actualizar filtros cuando cambie el término de búsqueda
     useEffect(() => {
         if (searchTerm) {
             setColumnFilters([{ id: "name", value: searchTerm }]);
@@ -154,8 +153,6 @@ export const useRoleTable = ({
         }
     }, [searchTerm]);
 
-    // Sincronización unidireccional: desde backend a estado local
-    // Solo actualizar cuando cambie la página del backend
     useEffect(() => {
         const backendPageIndex = (paginationMeta?.currentPage || 1) - 1;
         if (pagination.pageIndex !== backendPageIndex) {
@@ -166,10 +163,8 @@ export const useRoleTable = ({
         }
     }, [paginationMeta?.currentPage]);
 
-    // Manejar cambios de página iniciados por el usuario
     const handlePaginationChange = (updatedPagination: typeof pagination) => {
         setPagination(updatedPagination);
-        // Convertir de base-0 a base-1 para el backend
         if (updatedPagination.pageIndex !== pagination.pageIndex) {
             onPageChange(updatedPagination.pageIndex + 1);
         }
