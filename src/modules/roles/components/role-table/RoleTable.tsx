@@ -43,6 +43,9 @@ export const RoleTable: React.FC = () => {
     const context = useRoleTableContext() as ExtendedRoleTableContext;
     const { roles, paginationMeta } = context;
 
+    console.log("RoleTable - roles recibidos:", roles);
+    console.log("RoleTable - paginationMeta:", paginationMeta);
+
     const table = useReactTable({
         data: roles || [],
         columns,
@@ -141,14 +144,21 @@ export const RoleTable: React.FC = () => {
                     </motion.div>
                 </AnimatePresence>
             </div>
-
             <TablePagination
                 currentPage={table.getState().pagination.pageIndex}
                 totalPages={paginationMeta?.totalPages || 0}
                 totalItems={paginationMeta?.total || 0}
                 pageSize={paginationMeta?.perPage || 10}
                 selectedCount={table.getFilteredSelectedRowModel().rows.length}
-                onPageChange={(page) => table.setPageIndex(page)}
+                onPageChange={(pageIndex) => {
+                    if (!isNaN(pageIndex) && typeof pageIndex === 'number') {
+                        table.setPageIndex(pageIndex);
+                        setPagination({
+                            pageIndex: pageIndex,
+                            pageSize: table.getState().pagination.pageSize
+                        });
+                    }
+                }}
             />
         </div>
     );
