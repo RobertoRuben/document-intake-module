@@ -23,8 +23,14 @@ export class RoleService {
      * @returns Paginated response with roles
      */
     async getPaginatedRoles(page: number = 1, size: number = 10): Promise<PaginatedRolesResponseModel> {
+        console.log(`Llamando a getPaginatedRoles - page: ${page}, size: ${size}`);
         const response = await axiosInstance.get<unknown>(`/role/paginated?page=${page}&size=${size}`);
-        return camelizeKeys(response.data) as PaginatedRolesResponseModel;
+        console.log('Respuesta getPaginatedRoles (raw):', response.data);
+        const paginatedResult = camelizeKeys(response.data) as PaginatedRolesResponseModel;
+        console.log('PaginatedRoles procesado:', paginatedResult);
+        console.log('Roles disponibles:', paginatedResult.data);
+        console.log('Metadata de paginación:', paginatedResult.meta);
+        return paginatedResult;
     }
 
     /**
