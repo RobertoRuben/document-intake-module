@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { AuthModelRequest } from "../models/auth.model.request.ts";
+import { AuthRequestModel } from "../models/auth.request.model.ts";
 import { useAuthContext } from "../context/auth.context.tsx";
 
 export const useLoginFormHook = () => {
-  const [credentials, setCredentials] = useState<AuthModelRequest>({
+  const [credentials, setCredentials] = useState<AuthRequestModel>({
     username: "",
     password: "",
   });

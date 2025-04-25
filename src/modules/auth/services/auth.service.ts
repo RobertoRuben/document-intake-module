@@ -1,6 +1,6 @@
 import axiosInstance from "../../globals/axios-config";
-import { AuthModelRequest } from "../models/auth.model.request.ts";
-import { AuthModelResponse } from "../models/auth.model.response.ts";
+import { AuthRequestModel } from "../models/auth.request.model.ts";
+import { AuthResponseModel } from "../models/auth.response.model.ts";
 import { camelizeKeys, decamelizeKeys } from "humps";
 
 /**
@@ -12,7 +12,7 @@ export class AuthService {
      * @param credentials User credentials
      * @returns Authentication response with tokens
      */
-    async login(credentials: AuthModelRequest): Promise<AuthModelResponse> {
+    async login(credentials: AuthRequestModel): Promise<AuthResponseModel> {
         const formData = new URLSearchParams();
         formData.append("username", credentials.username);
         formData.append("password", credentials.password);
@@ -23,7 +23,7 @@ export class AuthService {
             },
         });
 
-        const camelCaseResponse = camelizeKeys(response.data) as AuthModelResponse;
+        const camelCaseResponse = camelizeKeys(response.data) as AuthResponseModel;
 
         sessionStorage.setItem("accessToken", camelCaseResponse.accessToken);
         sessionStorage.setItem("refreshToken", camelCaseResponse.refreshToken);
@@ -35,7 +35,7 @@ export class AuthService {
      * Refreshes the access token using refreshToken
      * @returns New access token
      */
-    async refreshToken(): Promise<AuthModelResponse> {
+    async refreshToken(): Promise<AuthResponseModel> {
         const refreshToken = sessionStorage.getItem("refreshToken");
 
         if (!refreshToken) {
@@ -46,7 +46,7 @@ export class AuthService {
 
         const response = await axiosInstance.post<unknown>("/auth/refresh", payload);
 
-        const camelCaseResponse = camelizeKeys(response.data) as AuthModelResponse;
+        const camelCaseResponse = camelizeKeys(response.data) as AuthResponseModel;
 
         sessionStorage.setItem("accessToken", camelCaseResponse.accessToken);
         sessionStorage.setItem("refreshToken", camelCaseResponse.refreshToken);
