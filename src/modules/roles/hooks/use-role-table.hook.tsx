@@ -42,7 +42,6 @@ export const useRoleTable = ({
     });
     const [rowSelection, setRowSelection] = useState({});
 
-    // Inicializar la paginación usando currentPage-1 para convertir de base-1 a base-0
     const [pagination, setPagination] = useState({
         pageIndex: (paginationMeta?.currentPage || 1) - 1,
         pageSize: paginationMeta?.perPage || 10,

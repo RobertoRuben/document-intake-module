@@ -68,9 +68,6 @@ export const RoleTable: React.FC = () => {
     const context = useRoleTableContext() as unknown as ExtendedRoleTableContext;
     const { roles, paginationMeta } = context;
 
-    console.log("RoleTable - roles recibidos:", roles);
-    console.log("RoleTable - paginationMeta:", paginationMeta);
-
     const table = useReactTable({
         data: roles || [],
         columns,

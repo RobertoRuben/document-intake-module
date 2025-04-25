@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { roleService } from "@/modules/roles/service/role.service";
 import { RoleModel } from "@/modules/roles/models/role.model";
 import { PaginatedRolesResponseModel } from "@/modules/roles/models/role.page.model";
@@ -28,35 +28,29 @@ export const useRoleContainerHook = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchRoles = useCallback(async () => {
+    const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const fetchRoles = useCallback(async (page = currentPage, search = searchTerm) => {
         setIsLoading(true);
         setError(null);
         try {
             let response: PaginatedRolesResponseModel;
 
-            if (searchTerm) {
-                response = await roleService.searchRoles(searchTerm, currentPage);
+            if (search) {
+                response = await roleService.searchRoles(search, page);
             } else {
-                response = await roleService.getPaginatedRoles(currentPage);
+                response = await roleService.getPaginatedRoles(page);
             }
 
-            console.log("Respuesta completa recibida:", response);
-
-            // Verificar explícitamente la estructura
             if (response && response.data) {
-                console.log("Estableciendo roles:", response.data);
                 setRoles(response.data);
 
                 if (response.meta) {
-                    console.log("Estableciendo metadata:", response.meta);
                     setPaginationMeta(response.meta);
-                } else {
-                    console.error("No se encontró meta en la respuesta");
                 }
 
                 setDataVersion(prev => prev + 1);
             } else {
-                console.error("Estructura de respuesta inesperada:", response);
                 setRoles([]);
             }
         } catch (err) {
@@ -70,11 +64,28 @@ export const useRoleContainerHook = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [searchTerm, currentPage]);
+    }, []);
 
     useEffect(() => {
-        fetchRoles();
-    }, [fetchRoles]);
+        fetchRoles(1, "");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (fetchTimeoutRef.current) {
+            clearTimeout(fetchTimeoutRef.current);
+        }
+
+        fetchTimeoutRef.current = setTimeout(() => {
+            fetchRoles(currentPage, searchTerm);
+        }, 300);
+
+        return () => {
+            if (fetchTimeoutRef.current) {
+                clearTimeout(fetchTimeoutRef.current);
+            }
+        };
+    }, [currentPage, searchTerm, fetchRoles]);
 
     const handleAddRole = useCallback(() => {
         setSelectedRole(undefined);
@@ -105,7 +116,7 @@ export const useRoleContainerHook = () => {
                 toast.success("Rol eliminado", {
                     description: "El rol ha sido eliminado correctamente"
                 });
-                await fetchRoles();
+                fetchRoles(currentPage, searchTerm);
             } catch (err) {
                 const errorMessage = err instanceof Error ? err.message : "Error al eliminar el rol";
                 setError(errorMessage);
@@ -118,7 +129,7 @@ export const useRoleContainerHook = () => {
                 setRoleToDelete(undefined);
             }
         }
-    }, [roleToDelete, fetchRoles]);
+    }, [roleToDelete, currentPage, searchTerm, fetchRoles]);
 
     const handleCancelDelete = useCallback(() => {
         setIsDeleteModalOpen(false);
@@ -144,7 +155,7 @@ export const useRoleContainerHook = () => {
                     description: "El rol ha sido creado correctamente"
                 });
             }
-            await fetchRoles();
+            fetchRoles(currentPage, searchTerm);
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Error al guardar el rol";
             setError(errorMessage);
@@ -155,7 +166,7 @@ export const useRoleContainerHook = () => {
             setIsLoading(false);
             setIsModalOpen(false);
         }
-    }, [fetchRoles]);
+    }, [currentPage, searchTerm, fetchRoles]);
 
     const handleSearchChange = useCallback((value: string) => {
         setSearchTerm(value);
