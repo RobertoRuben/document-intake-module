@@ -2,7 +2,7 @@ import React from "react";
 import { RoleHeader } from "@/modules/roles/components/role-header/RoleHeader";
 import { RoleTable } from "@/modules/roles/components/role-table/RoleTable";
 import { RoleTableProvider } from "@/modules/roles/context/role-table.context";
-import { useRoleContainerHook } from "@/modules/roles/hooks/use-role-container.hook";
+import { useRoleContext } from "@/modules/roles/context/role.context";
 import { DeleteModal } from "@/globals/modals/delete-modal/DeleteModal";
 import { RoleModal } from "@/modules/roles/modals/RoleModal";
 import { Loader2 } from "lucide-react";
@@ -10,13 +10,8 @@ import { Loader2 } from "lucide-react";
 export const RoleContainer: React.FC = () => {
     const {
         roles,
-        paginationMeta,
-        dataVersion,
-        searchTerm,
         isLoading,
         handleAddRole,
-        handleEditRole,
-        handleDeleteRole,
         isModalOpen,
         selectedRole,
         handleCloseModal,
@@ -24,10 +19,8 @@ export const RoleContainer: React.FC = () => {
         isDeleteModalOpen,
         roleToDelete,
         handleConfirmDelete,
-        handleCancelDelete,
-        handleSearchChange,
-        handlePageChange
-    } = useRoleContainerHook();
+        handleCancelDelete
+    } = useRoleContext();
 
     if (isLoading && roles.length === 0) {
         return (
@@ -43,16 +36,7 @@ export const RoleContainer: React.FC = () => {
             <RoleHeader onAddClick={handleAddRole} />
 
             <div className="bg-white rounded-lg shadow-md p-6">
-                <RoleTableProvider
-                    roles={roles}
-                    paginationMeta={paginationMeta}
-                    dataVersion={dataVersion}
-                    searchTerm={searchTerm}
-                    onEdit={handleEditRole}
-                    onDelete={handleDeleteRole}
-                    onSearchChange={handleSearchChange}
-                    onPageChange={handlePageChange}
-                >
+                <RoleTableProvider>
                     <RoleTable />
                 </RoleTableProvider>
             </div>
