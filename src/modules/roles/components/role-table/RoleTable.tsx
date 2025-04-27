@@ -20,6 +20,7 @@ import { RoleSearchInput } from "./RoleSearchInput";
 import { ColumnVisibilityDropdown } from "./ColumnVisibilityDropdown";
 import { TablePagination } from "./TablePagination";
 import { BulkDeleteButton } from "@/globals/components/BulkDeleteButton";
+import { ExportToExcelButton } from "@/globals/components/ExportToExcelButton";
 import { useRoleTableContext } from "@/modules/roles/context/role-table.context";
 import { RoleModel } from "@/modules/roles/models/role.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
@@ -42,6 +43,7 @@ interface RoleTableContextType {
     searchTerm: string;
     onSearchChange: (value: string) => void;
     handleBulkDelete: () => void;
+    getSelectedRoleIds?: () => number[];
 }
 
 interface ExtendedRoleTableContext extends RoleTableContextType {
@@ -67,11 +69,19 @@ export const RoleTable: React.FC = () => {
         dataVersion,
         searchTerm,
         onSearchChange,
-        handleBulkDelete
+        handleBulkDelete,
+        getSelectedRoleIds
     } = useRoleTableContext() as unknown as RoleTableContextType;
 
     const context = useRoleTableContext() as unknown as ExtendedRoleTableContext;
     const { roles, paginationMeta } = context;
+
+    const handleExportToExcel = () => {
+        if (getSelectedRoleIds) {
+            const selectedIds = getSelectedRoleIds();
+            console.log("Exportando roles con IDs:", selectedIds);
+        }
+    };
 
     const table = useReactTable({
         data: roles || [],
@@ -113,12 +123,20 @@ export const RoleTable: React.FC = () => {
                 </div>
                 
                 {totalSelectedRows > 0 && (
-                    <div className="w-full">
-                        <BulkDeleteButton
-                            selectedCount={totalSelectedRows}
-                            onDelete={handleBulkDelete}
-                        />
-                    </div>
+                    <>
+                        <div className="w-full">
+                            <ExportToExcelButton
+                                selectedCount={totalSelectedRows}
+                                onExport={handleExportToExcel}
+                            />
+                        </div>
+                        <div className="w-full">
+                            <BulkDeleteButton
+                                selectedCount={totalSelectedRows}
+                                onDelete={handleBulkDelete}
+                            />
+                        </div>
+                    </>
                 )}
                 
                 <div className="w-full">
@@ -142,12 +160,20 @@ export const RoleTable: React.FC = () => {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                    <BulkDeleteButton
-                        selectedCount={totalSelectedRows}
-                        onDelete={handleBulkDelete}
-                    />
+                    {totalSelectedRows > 0 && (
+                        <>
+                            <ExportToExcelButton
+                                selectedCount={totalSelectedRows}
+                                onExport={handleExportToExcel}
+                            />
+                            <BulkDeleteButton
+                                selectedCount={totalSelectedRows}
+                                onDelete={handleBulkDelete}
+                            />
+                        </>
+                    )}
                     
-                    <div className="w-[150px]">
+                    <div className="w-[200px]">
                         <ColumnVisibilityDropdown
                             columns={table.getAllColumns().map((column) => ({
                                 id: column.id,
