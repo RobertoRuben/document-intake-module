@@ -19,6 +19,7 @@ import { EmptyRoleMessage } from "./EmptyRoleMessage";
 import { RoleSearchInput } from "./RoleSearchInput";
 import { ColumnVisibilityDropdown } from "./ColumnVisibilityDropdown";
 import { TablePagination } from "./TablePagination";
+import { BulkDeleteButton } from "@/globals/components/BulkDeleteButton";
 import { useRoleTableContext } from "@/modules/roles/context/role-table.context";
 import { RoleModel } from "@/modules/roles/models/role.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
@@ -40,6 +41,7 @@ interface RoleTableContextType {
     dataVersion: number;
     searchTerm: string;
     onSearchChange: (value: string) => void;
+    handleBulkDelete: () => void;
 }
 
 interface ExtendedRoleTableContext extends RoleTableContextType {
@@ -57,13 +59,15 @@ export const RoleTable: React.FC = () => {
         setColumnVisibility,
         rowSelection,
         setRowSelection,
+        totalSelectedRows,
         pagination,
         setPagination,
         columns,
         tableVariants,
         dataVersion,
         searchTerm,
-        onSearchChange
+        onSearchChange,
+        handleBulkDelete
     } = useRoleTableContext() as unknown as RoleTableContextType;
 
     const context = useRoleTableContext() as unknown as ExtendedRoleTableContext;
@@ -100,24 +104,61 @@ export const RoleTable: React.FC = () => {
 
     return (
         <div className="w-full">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
-            <div className="w-full md:w-auto">
-                <RoleSearchInput
-                    value={searchTerm}
-                    onChange={onSearchChange}
-                />
+            <div className="flex flex-col gap-4 py-4 md:hidden">
+                <div className="w-full">
+                    <RoleSearchInput
+                        value={searchTerm}
+                        onChange={onSearchChange}
+                    />
+                </div>
+                
+                {totalSelectedRows > 0 && (
+                    <div className="w-full">
+                        <BulkDeleteButton
+                            selectedCount={totalSelectedRows}
+                            onDelete={handleBulkDelete}
+                        />
+                    </div>
+                )}
+                
+                <div className="w-full">
+                    <ColumnVisibilityDropdown
+                        columns={table.getAllColumns().map((column) => ({
+                            id: column.id,
+                            isVisible: column.getIsVisible(),
+                            toggleVisibility: (value) => column.toggleVisibility(value),
+                            getCanHide: () => column.getCanHide(),
+                        }))}
+                    />
+                </div>
             </div>
-            <div className="w-full md:w-auto">
-                <ColumnVisibilityDropdown
-                    columns={table.getAllColumns().map((column) => ({
-                        id: column.id,
-                        isVisible: column.getIsVisible(),
-                        toggleVisibility: (value) => column.toggleVisibility(value),
-                        getCanHide: () => column.getCanHide(),
-                    }))}
-                />
+            
+            <div className="hidden md:flex md:items-center md:justify-between gap-4 py-4">
+                <div className="w-full md:w-1/2 lg:w-1/3">
+                    <RoleSearchInput
+                        value={searchTerm}
+                        onChange={onSearchChange}
+                    />
+                </div>
+                
+                <div className="flex items-center gap-2">
+                    <BulkDeleteButton
+                        selectedCount={totalSelectedRows}
+                        onDelete={handleBulkDelete}
+                    />
+                    
+                    <div className="w-[150px]">
+                        <ColumnVisibilityDropdown
+                            columns={table.getAllColumns().map((column) => ({
+                                id: column.id,
+                                isVisible: column.getIsVisible(),
+                                toggleVisibility: (value) => column.toggleVisibility(value),
+                                getCanHide: () => column.getCanHide(),
+                            }))}
+                        />
+                    </div>
+                </div>
             </div>
-        </div>
 
             <div className="overflow-x-auto rounded-md border">
                 <AnimatePresence mode="wait">
