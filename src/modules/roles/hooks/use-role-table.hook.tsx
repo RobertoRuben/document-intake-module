@@ -21,6 +21,7 @@ interface UseRoleTableProps {
     searchTerm: string;
     onEdit: (id?: number) => void;
     onDelete: (id?: number) => void;
+    onBulkDelete?: (ids: number[]) => void;
     onSearchChange: (value: string) => void;
     onPageChange: (page: number) => void;
 }
@@ -32,6 +33,7 @@ export const useRoleTable = ({
                                  searchTerm,
                                  onEdit,
                                  onDelete,
+                                 onBulkDelete,
                                  onSearchChange,
                                  onPageChange,
                              }: UseRoleTableProps) => {
@@ -40,6 +42,7 @@ export const useRoleTable = ({
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
         createdAt: false,
         updatedAt: false,
+        actions: true,
     });
     
     const [selectedRoleIds, setSelectedRoleIds] = useState<Record<number, boolean>>({});
@@ -51,6 +54,12 @@ export const useRoleTable = ({
         pageSize: paginationMeta?.perPage || 10,
     });
 
+    useEffect(() => {
+        setColumnVisibility(prev => ({
+            ...prev,
+            actions: totalSelectedRows === 0
+        }));
+    }, [totalSelectedRows]);
 
     const rowSelection = useMemo(() => {
         const selection: RowSelectionState = {};
@@ -70,6 +79,28 @@ export const useRoleTable = ({
             setTotalSelectedRows(selectedCount);
         }
     }, [selectedRoleIds, paginationMeta?.total, allSelected]);
+
+    const getSelectedRoleIds = (): number[] => {
+        if (allSelected) {
+            return roles.map(role => role.id as number);
+        } else {
+            return Object.keys(selectedRoleIds)
+                .filter(id => selectedRoleIds[Number(id)])
+                .map(id => Number(id));
+        }
+    };
+
+    const handleBulkDelete = () => {
+        const selectedIds = getSelectedRoleIds();
+        if (onBulkDelete && selectedIds.length > 0) {
+            onBulkDelete(selectedIds);
+            setAllSelected(false);
+            setSelectedRoleIds({});
+            setTotalSelectedRows(0);
+        } else {
+            console.warn("Función onBulkDelete no proporcionada o no hay roles seleccionados");
+        }
+    };
 
     const handleRowSelectionChange = (newSelection: RowSelectionState) => {
         const newSelectedRoleIds = { ...selectedRoleIds };
@@ -287,5 +318,7 @@ export const useRoleTable = ({
         onSearchChange,
         allSelected,
         setAllSelected,
+        handleBulkDelete,
+        getSelectedRoleIds,
     };
 };
