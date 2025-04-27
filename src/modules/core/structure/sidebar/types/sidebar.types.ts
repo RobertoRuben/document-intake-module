@@ -4,6 +4,7 @@ export type NavSubItem = {
     name: string;
     path: string;
     allowedRoles?: string[];
+    icon?: LucideIcon;
 };
 
 export type NavItem = {
