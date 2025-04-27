@@ -10,9 +10,13 @@ interface RoleModalFooterProps {
 
 export const RoleModalFooter: React.FC<RoleModalFooterProps> = ({ isEditing, onClose, onSubmit }) => {
     return (
-        <DialogFooter className="p-6 flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
-            <CancelButton onClose={onClose} />
-            <SubmitButton isEditing={isEditing} onSubmit={onSubmit} />
+        <DialogFooter className="flex flex-col w-full space-y-3 sm:space-y-0">
+            <div className="w-full sm:mb-3">
+                <CancelButton onClose={onClose} />
+            </div>
+            <div className="w-full">
+                <SubmitButton isEditing={isEditing} onSubmit={onSubmit} />
+            </div>
         </DialogFooter>
     );
 };

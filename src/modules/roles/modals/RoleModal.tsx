@@ -25,15 +25,17 @@ export const RoleModal: React.FC<RoleModalProps> = ({
     return (
         <Dialog open={isOpen} onOpenChange={() => onClose()}>
             <DialogContent
-                className="max-w-md w-full p-0 overflow-hidden [&>button]:hidden"
+                className="max-w-md w-full p-0 overflow-hidden [&>button]:hidden max-h-[90vh]"
             >
                 <RoleModalHeader isEditing={isEditing} />
-                <RoleModalForm
-                    role={role}
-                    isEditing={isEditing}
-                    onClose={onClose}
-                    onSubmit={onSubmit}
-                />
+                <div className="max-h-[calc(90vh-130px)] overflow-y-auto">
+                    <RoleModalForm
+                        role={role}
+                        isEditing={isEditing}
+                        onClose={onClose}
+                        onSubmit={onSubmit}
+                    />
+                </div>
             </DialogContent>
         </Dialog>
     );

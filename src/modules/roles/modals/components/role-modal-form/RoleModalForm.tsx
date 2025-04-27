@@ -1,4 +1,3 @@
-// src/modules/roles/modals/components/role-modal-form/RoleModalForm.tsx
 import React from "react";
 import { Form } from "@/modules/core/components/ui/form";
 import { RoleModel } from "@/modules/roles/models/role.model";
@@ -33,8 +32,10 @@ export const RoleModalForm: React.FC<RoleModalFormProps> = ({
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="p-6 space-y-6">
-                <RoleFormFields form={form} />
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="p-6">
+                <div className="mb-6">
+                    <RoleFormFields form={form} />
+                </div>
                 <RoleModalFooter
                     isEditing={isEditing}
                     onClose={onClose}
