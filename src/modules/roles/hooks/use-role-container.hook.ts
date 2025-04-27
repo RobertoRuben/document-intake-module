@@ -230,6 +230,7 @@ export const useRoleContainerHook = () => {
             invalidateCache();
             fetchRoles(currentPage, searchTerm, true);
             setIsModalOpen(false);
+            return true;
         } catch (err) {
             let errorMessage = "Error al guardar el rol";
             
@@ -243,12 +244,9 @@ export const useRoleContainerHook = () => {
             toast.error("Error", {
                 description: errorMessage
             });
-            
             setIsLoading(false);
-            return;
+            return false;
         }
-        
-        setIsLoading(false);
     }, [currentPage, searchTerm, fetchRoles, invalidateCache]);
 
     const handleSearchChange = useCallback((value: string) => {

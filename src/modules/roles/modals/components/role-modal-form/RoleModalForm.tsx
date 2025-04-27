@@ -10,7 +10,7 @@ interface RoleModalFormProps {
     role?: RoleModel;
     isEditing: boolean;
     onClose: () => void;
-    onSubmit: (data: RoleModel) => void;
+    onSubmit: (data: RoleModel) => Promise<boolean>; 
 }
 
 export const RoleModalForm: React.FC<RoleModalFormProps> = ({
@@ -26,8 +26,11 @@ export const RoleModalForm: React.FC<RoleModalFormProps> = ({
             id: role?.id || undefined,
             name: values.name,
         };
-        await onSubmit(roleData);
-        onClose();
+        
+        const success = await onSubmit(roleData);
+        if (success) {
+            onClose();
+        }
     };
 
     return (

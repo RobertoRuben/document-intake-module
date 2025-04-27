@@ -11,7 +11,7 @@ interface RoleModalProps {
     isOpen: boolean;
     role?: RoleModel;
     onClose: () => void;
-    onSubmit: (data: RoleModel) => void;
+    onSubmit: (data: RoleModel) => Promise<boolean>;
 }
 
 export const RoleModal: React.FC<RoleModalProps> = ({
