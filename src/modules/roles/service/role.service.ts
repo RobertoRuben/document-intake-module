@@ -2,18 +2,71 @@ import axiosInstance from "../../../globals/config/axios-config";
 import { camelizeKeys, decamelizeKeys } from "humps";
 import { RoleModel} from "@/modules/roles/models/role.model";
 import { PaginatedRolesResponseModel} from "@/modules/roles/models/role.page.model";
+import axios, { AxiosError } from "axios";
+
+export class RoleOperationError extends Error {
+    code: number;
+    details: string;
+
+    constructor(message: string, code: number = 500, details: string = "") {
+        super(message);
+        this.name = "RoleOperationError";
+        this.code = code;
+        this.details = details;
+    }
+}
 
 /**
  * Service for managing system roles
  */
 export class RoleService {
     /**
+     * Procesa errores de la API y extrae los detalles
+     */
+    private handleApiError(error: unknown): never {
+        if (axios.isAxiosError(error)) {
+            const axiosError = error as AxiosError;
+            interface ErrorResponse {
+                detail?: {
+                    details?: string;
+                    message?: string;
+                    code?: number;
+                };
+            }
+            const responseData = axiosError.response?.data as ErrorResponse;
+            
+            if (responseData?.detail) {
+                const errorDetail = responseData.detail;
+                const details = errorDetail.details || errorDetail.message || "Error en la operación";
+                const code = errorDetail.code || axiosError.response?.status || 500;
+                
+                throw new RoleOperationError(
+                    errorDetail.message || "Error en la operación", 
+                    code,
+                    details
+                );
+            }
+            
+            throw new RoleOperationError(
+                "Error en la comunicación con el servidor", 
+                axiosError.response?.status || 500
+            );
+        }
+        
+        throw new RoleOperationError("Error inesperado en la operación");
+    }
+
+    /**
      * Gets all roles
      * @returns List of roles
      */
     async getAllRoles(): Promise<RoleModel[]> {
-        const response = await axiosInstance.get<unknown>("/role");
-        return camelizeKeys(response.data) as RoleModel[];
+        try {
+            const response = await axiosInstance.get<unknown>("/role");
+            return camelizeKeys(response.data) as RoleModel[];
+        } catch (error) {
+            throw this.handleApiError(error);
+        }
     }
 
     /**
@@ -23,9 +76,13 @@ export class RoleService {
      * @returns Paginated response with roles
      */
     async getPaginatedRoles(page: number = 1, size: number = 10): Promise<PaginatedRolesResponseModel> {
-        const response = await axiosInstance.get<unknown>(`/role/paginated?page=${page}&size=${size}`);
-        const paginatedResult = camelizeKeys(response.data) as PaginatedRolesResponseModel;
-        return paginatedResult;
+        try {
+            const response = await axiosInstance.get<unknown>(`/role/paginated?page=${page}&size=${size}`);
+            const paginatedResult = camelizeKeys(response.data) as PaginatedRolesResponseModel;
+            return paginatedResult;
+        } catch (error) {
+            throw this.handleApiError(error);
+        }
     }
 
     /**
@@ -36,8 +93,12 @@ export class RoleService {
      * @returns Paginated response with roles matching the search
      */
     async searchRoles(searchTerm: string, page: number = 1, size: number = 10): Promise<PaginatedRolesResponseModel> {
-        const response = await axiosInstance.get<unknown>(`/role/search?search_term=${searchTerm}&page=${page}&size=${size}`);
-        return camelizeKeys(response.data) as PaginatedRolesResponseModel;
+        try {
+            const response = await axiosInstance.get<unknown>(`/role/search?search_term=${searchTerm}&page=${page}&size=${size}`);
+            return camelizeKeys(response.data) as PaginatedRolesResponseModel;
+        } catch (error) {
+            throw this.handleApiError(error);
+        }
     }
 
     /**
@@ -46,8 +107,12 @@ export class RoleService {
      * @returns Role data
      */
     async getRoleById(id: number): Promise<RoleModel> {
-        const response = await axiosInstance.get<unknown>(`/role/${id}`);
-        return camelizeKeys(response.data) as RoleModel;
+        try {
+            const response = await axiosInstance.get<unknown>(`/role/${id}`);
+            return camelizeKeys(response.data) as RoleModel;
+        } catch (error) {
+            throw this.handleApiError(error);
+        }
     }
 
     /**
@@ -56,9 +121,13 @@ export class RoleService {
      * @returns Created role
      */
     async createRole(role: RoleModel): Promise<RoleModel> {
-        const payload = decamelizeKeys(role);
-        const response = await axiosInstance.post<unknown>("/role", payload);
-        return camelizeKeys(response.data) as RoleModel;
+        try {
+            const payload = decamelizeKeys(role);
+            const response = await axiosInstance.post<unknown>("/role", payload);
+            return camelizeKeys(response.data) as RoleModel;
+        } catch (error) {
+            throw this.handleApiError(error);
+        }
     }
 
     /**
@@ -68,9 +137,13 @@ export class RoleService {
      * @returns Updated role
      */
     async updateRole(id: number, role: RoleModel): Promise<RoleModel> {
-        const payload = decamelizeKeys(role);
-        const response = await axiosInstance.put<unknown>(`/role/${id}`, payload);
-        return camelizeKeys(response.data) as RoleModel;
+        try {
+            const payload = decamelizeKeys(role);
+            const response = await axiosInstance.put<unknown>(`/role/${id}`, payload);
+            return camelizeKeys(response.data) as RoleModel;
+        } catch (error) {
+            throw this.handleApiError(error);
+        }
     }
 
     /**
@@ -79,8 +152,12 @@ export class RoleService {
      * @returns Confirmation message
      */
     async deleteRole(id: number): Promise<{ message: string }> {
-        const response = await axiosInstance.delete<unknown>(`/role/${id}`);
-        return camelizeKeys(response.data) as { message: string };
+        try {
+            const response = await axiosInstance.delete<unknown>(`/role/${id}`);
+            return camelizeKeys(response.data) as { message: string };
+        } catch (error) {
+            throw this.handleApiError(error);
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { roleService } from "@/modules/roles/service/role.service";
+import { roleService, RoleOperationError } from "@/modules/roles/service/role.service";
 import { RoleModel } from "@/modules/roles/models/role.model";
 import { PaginatedRolesResponseModel } from "@/modules/roles/models/role.page.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
@@ -29,13 +29,10 @@ export const useRoleContainerHook = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Ref para debouncing
     const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     
-    // Ref para prevenir llamadas duplicadas
     const lastFetchParamsRef = useRef<{page: number, search: string} | null>(null);
     
-    // Caché de datos por página y término de búsqueda
     const pagesCache = useRef<Record<string, {
         data: RoleModel[],
         meta: PaginationMetaModel,
@@ -97,7 +94,14 @@ export const useRoleContainerHook = () => {
                 setRoles([]);
             }
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : "Error al cargar los roles";
+            let errorMessage = "Error al cargar los roles";
+            
+            if (err instanceof RoleOperationError) {
+                errorMessage = err.details || err.message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+            
             setError(errorMessage);
             toast.error("Error", {
                 description: errorMessage,
@@ -177,7 +181,14 @@ export const useRoleContainerHook = () => {
                 invalidateCache();
                 fetchRoles(currentPage, searchTerm, true);
             } catch (err) {
-                const errorMessage = err instanceof Error ? err.message : "Error al eliminar el rol";
+                let errorMessage = "Error al eliminar el rol";
+                
+                if (err instanceof RoleOperationError) {
+                    errorMessage = err.details || err.message;
+                } else if (err instanceof Error) {
+                    errorMessage = err.message;
+                }
+                
                 setError(errorMessage);
                 toast.error("Error", {
                     description: errorMessage
@@ -217,18 +228,27 @@ export const useRoleContainerHook = () => {
             }
             
             invalidateCache();
-            
             fetchRoles(currentPage, searchTerm, true);
+            setIsModalOpen(false);
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : "Error al guardar el rol";
+            let errorMessage = "Error al guardar el rol";
+            
+            if (err instanceof RoleOperationError) {
+                errorMessage = err.details || err.message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+            
             setError(errorMessage);
             toast.error("Error", {
                 description: errorMessage
             });
-        } finally {
+            
             setIsLoading(false);
-            setIsModalOpen(false);
+            return;
         }
+        
+        setIsLoading(false);
     }, [currentPage, searchTerm, fetchRoles, invalidateCache]);
 
     const handleSearchChange = useCallback((value: string) => {
@@ -288,7 +308,11 @@ export const useRoleContainerHook = () => {
                                         };
                                     }
                                 } catch (err) {
-                                    console.log(`Error: `, err);
+                                    if (err instanceof RoleOperationError) {
+                                        console.log(`Error en precarga: ${err.details || err.message}`);
+                                    } else {
+                                        console.log(`Error en precarga: `, err);
+                                    }
                                 }
                             })();
                         }

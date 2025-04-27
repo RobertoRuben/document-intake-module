@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     Dialog,
     DialogContent
@@ -20,17 +20,33 @@ export const RoleModal: React.FC<RoleModalProps> = ({
                                                         onClose,
                                                         onSubmit
                                                     }) => {
-    const isEditing = !!role;
+    // Mantener una copia interna del estado de edición
+    const [internalRole, setInternalRole] = useState<RoleModel | undefined>(role);
+    const isEditing = !!internalRole;
+
+    useEffect(() => {
+        if (isOpen) {
+            setInternalRole(role);
+        }
+    }, [isOpen, role]);
+
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            setTimeout(() => {
+                onClose();
+            }, 300);
+        }
+    };
 
     return (
-        <Dialog open={isOpen} onOpenChange={() => onClose()}>
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogContent
                 className="max-w-md w-full p-0 overflow-hidden [&>button]:hidden max-h-[90vh]"
             >
                 <RoleModalHeader isEditing={isEditing} />
                 <div className="max-h-[calc(90vh-130px)] overflow-y-auto">
                     <RoleModalForm
-                        role={role}
+                        role={internalRole}
                         isEditing={isEditing}
                         onClose={onClose}
                         onSubmit={onSubmit}
