@@ -15,13 +15,9 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
     currentPage,
     totalPages,
     totalItems,
-    pageSize,
     selectedCount,
     onPageChange,
 }) => {
-    const pageStart = (currentPage * pageSize) + 1;
-    const pageEnd = Math.min((currentPage + 1) * pageSize, totalItems);
-
     return (
         <div className="flex items-center justify-between py-4">
             <div className="text-sm text-muted-foreground">
@@ -29,7 +25,7 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
                     <span>{selectedCount} de {totalItems} fila(s) seleccionada(s).</span>
                 ) : (
                     <span>
-                        Mostrando {totalItems > 0 ? `${pageStart}-${pageEnd} de ${totalItems}` : '0'} registros
+                        Mostrado {currentPage + 1} de {totalPages} páginas
                     </span>
                 )}
             </div>
@@ -47,7 +43,6 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
                     className="flex items-center"
                 >
                     <ChevronLeft className="h-4 w-4" />
-                    {/* Texto visible solo en pantallas md y superiores */}
                     <span className="ml-1 hidden md:inline">Anterior</span>
                 </Button>
                 <Button
@@ -62,7 +57,6 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
                     disabled={currentPage >= totalPages - 1}
                     className="flex items-center"
                 >
-                    {/* Texto visible solo en pantallas md y superiores */}
                     <span className="mr-1 hidden md:inline">Siguiente</span>
                     <ChevronRight className="h-4 w-4" />
                 </Button>

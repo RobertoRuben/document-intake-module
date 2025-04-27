@@ -3,7 +3,8 @@ import {
     SortingState,
     ColumnFiltersState,
     VisibilityState,
-    ColumnDef
+    ColumnDef,
+    RowSelectionState
 } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/modules/core/components/ui/button";
@@ -40,12 +41,64 @@ export const useRoleTable = ({
         createdAt: false,
         updatedAt: false,
     });
-    const [rowSelection, setRowSelection] = useState({});
+    
+    const [selectedRoleIds, setSelectedRoleIds] = useState<Record<number, boolean>>({});
+    const [totalSelectedRows, setTotalSelectedRows] = useState<number>(0);
+    const [allSelected, setAllSelected] = useState<boolean>(false);
 
     const [pagination, setPagination] = useState({
         pageIndex: (paginationMeta?.currentPage || 1) - 1,
         pageSize: paginationMeta?.perPage || 10,
     });
+
+
+    const rowSelection = useMemo(() => {
+        const selection: RowSelectionState = {};
+        roles.forEach((role, index) => {
+            if (role.id !== undefined && (selectedRoleIds[role.id] || allSelected)) {
+                selection[index] = true;
+            }
+        });
+        return selection;
+    }, [roles, selectedRoleIds, allSelected]);
+
+    useEffect(() => {
+        if (allSelected && paginationMeta?.total) {
+            setTotalSelectedRows(paginationMeta.total);
+        } else {
+            const selectedCount = Object.values(selectedRoleIds).filter(Boolean).length;
+            setTotalSelectedRows(selectedCount);
+        }
+    }, [selectedRoleIds, paginationMeta?.total, allSelected]);
+
+    const handleRowSelectionChange = (newSelection: RowSelectionState) => {
+        const newSelectedRoleIds = { ...selectedRoleIds };
+        
+        Object.entries(newSelection).forEach(([indexStr, isSelected]) => {
+            const index = parseInt(indexStr, 10);
+            const role = roles[index];
+            
+            if (role && typeof role.id === 'number') {
+                if (isSelected) {
+                    newSelectedRoleIds[role.id] = true;
+                } else {
+                    delete newSelectedRoleIds[role.id];
+                }
+            }
+        });
+        
+        const allCurrentPageSelected = 
+            roles.length > 0 && 
+            roles.every(role => typeof role.id === 'number' && newSelectedRoleIds[role.id]);
+            
+        if (allCurrentPageSelected && Object.keys(newSelectedRoleIds).length === paginationMeta?.total) {
+            setAllSelected(true);
+        } else if (Object.keys(newSelectedRoleIds).length === 0) {
+            setAllSelected(false);
+        }
+        
+        setSelectedRoleIds(newSelectedRoleIds);
+    };
 
     const columns = useMemo<ColumnDef<RoleModel>[]>(
         () => [
@@ -54,20 +107,58 @@ export const useRoleTable = ({
                 header: ({ table }) => (
                     <Checkbox
                         checked={
-                            table.getIsAllPageRowsSelected() ||
-                            (table.getIsSomePageRowsSelected() && "indeterminate")
+                            table.getRowModel().rows.length > 0 &&
+                            (allSelected || table.getIsAllRowsSelected())
                         }
-                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        onCheckedChange={(value) => {
+                            table.toggleAllRowsSelected(!!value);
+                            
+                            if (value) {
+                                setAllSelected(true);
+                                
+                                if (paginationMeta?.total) {
+                                    setTotalSelectedRows(paginationMeta.total);
+                                }
+                            } else {
+                                setAllSelected(false);
+                                setSelectedRoleIds({});
+                                setTotalSelectedRows(0);
+                            }
+                        }}
                         aria-label="Seleccionar todos"
                     />
                 ),
-                cell: ({ row }) => (
-                    <Checkbox
-                        checked={row.getIsSelected()}
-                        onCheckedChange={(value) => row.toggleSelected(!!value)}
-                        aria-label="Seleccionar fila"
-                    />
-                ),
+                cell: ({ row }) => {
+                    const role = row.original;
+                    return (
+                        <Checkbox
+                            checked={allSelected || (role.id !== undefined && selectedRoleIds[role.id] === true)}
+                            onCheckedChange={(value) => {
+                                row.toggleSelected(!!value);
+                                
+                                if (value) {
+                                    if (typeof role.id === 'number') {
+                                        const id = role.id;
+                                        setSelectedRoleIds(prev => ({ ...prev, [id.toString()]: true }));
+                                    }
+                                } else {
+                                    setSelectedRoleIds(prev => {
+                                        const updated = { ...prev };
+                                        if (typeof role.id === 'number') {
+                                            delete updated[role.id];
+                                        }
+                                        return updated;
+                                    });
+                                    
+                                    if (allSelected) {
+                                        setAllSelected(false);
+                                    }
+                                }
+                            }}
+                            aria-label="Seleccionar fila"
+                        />
+                    );
+                },
                 enableSorting: false,
                 enableHiding: false,
             },
@@ -142,7 +233,7 @@ export const useRoleTable = ({
                 enableSorting: false,
             },
         ],
-        [onEdit, onDelete]
+        [onEdit, onDelete, allSelected, paginationMeta?.total, selectedRoleIds]
     );
 
     useEffect(() => {
@@ -184,7 +275,8 @@ export const useRoleTable = ({
         columnVisibility,
         setColumnVisibility,
         rowSelection,
-        setRowSelection,
+        setRowSelection: handleRowSelectionChange,
+        totalSelectedRows,
         pagination,
         setPagination: handlePaginationChange,
         columns,
@@ -193,5 +285,7 @@ export const useRoleTable = ({
         dataVersion,
         searchTerm,
         onSearchChange,
+        allSelected,
+        setAllSelected,
     };
 };

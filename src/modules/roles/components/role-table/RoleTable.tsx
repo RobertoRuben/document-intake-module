@@ -32,6 +32,7 @@ interface RoleTableContextType {
     setColumnVisibility: OnChangeFn<VisibilityState>;
     rowSelection: RowSelectionState;
     setRowSelection: OnChangeFn<RowSelectionState>;
+    totalSelectedRows: number; 
     pagination: PaginationState;
     setPagination: OnChangeFn<PaginationState>;
     columns: ColumnDef<RoleModel, unknown>[];
@@ -181,7 +182,7 @@ export const RoleTable: React.FC = () => {
                 totalPages={paginationMeta?.totalPages || 0}
                 totalItems={paginationMeta?.total || 0}
                 pageSize={paginationMeta?.perPage || 10}
-                selectedCount={table.getFilteredSelectedRowModel().rows.length}
+                selectedCount={context.totalSelectedRows}
                 onPageChange={(pageIndex) => {
                     if (!isNaN(pageIndex) && typeof pageIndex === 'number') {
                         table.setPageIndex(pageIndex);
