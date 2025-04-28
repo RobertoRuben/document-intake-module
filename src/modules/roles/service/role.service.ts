@@ -78,7 +78,7 @@ export class RoleService {
    */
   async getPaginatedRoles(
     page: number = 1,
-    size: number = 10
+    size: number = 5
   ): Promise<PaginatedRolesResponseModel> {
     try {
       const response = await axiosInstance.get<unknown>(
@@ -103,7 +103,7 @@ export class RoleService {
   async searchRoles(
     searchTerm: string,
     page: number = 1,
-    size: number = 10
+    size: number = 5
   ): Promise<PaginatedRolesResponseModel> {
     try {
       const response = await axiosInstance.get<unknown>(
