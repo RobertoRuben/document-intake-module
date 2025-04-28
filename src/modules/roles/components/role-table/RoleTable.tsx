@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
     useReactTable,
@@ -22,8 +22,10 @@ import { TablePagination } from "./TablePagination";
 import { BulkDeleteButton } from "@/globals/components/BulkDeleteButton";
 import { ExportToExcelButton } from "@/globals/components/ExportToExcelButton";
 import { useRoleTableContext } from "@/modules/roles/context/role-table.context";
+import { useRoleContext } from "@/modules/roles/context/role.context";
 import { RoleModel } from "@/modules/roles/models/role.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
+import { toast } from "sonner";
 
 interface RoleTableContextType {
     sorting: SortingState;
@@ -52,6 +54,7 @@ interface ExtendedRoleTableContext extends RoleTableContextType {
 }
 
 export const RoleTable: React.FC = () => {
+    const [localLoading, setLocalLoading] = useState(false);
     const {
         sorting,
         setSorting,
@@ -75,11 +78,43 @@ export const RoleTable: React.FC = () => {
 
     const context = useRoleTableContext() as unknown as ExtendedRoleTableContext;
     const { roles, paginationMeta } = context;
+    const { handleExportToExcel: exportToExcel, isLoading } = useRoleContext();
 
-    const handleExportToExcel = () => {
+    const handleExportToExcel = async () => {
         if (getSelectedRoleIds) {
             const selectedIds = getSelectedRoleIds();
-            console.log("Exportando roles con IDs:", selectedIds);
+            if (selectedIds.length > 0) {
+                try {
+                    await exportToExcel(selectedIds);
+                } catch (error) {
+                    console.error("Error al exportar los roles:", error);
+                    toast.error("Error de exportación", {
+                        description: "No se pudieron exportar los roles seleccionados."
+                    });
+                }
+            } else {
+                toast.warning("Selección vacía", {
+                    description: "No hay roles seleccionados para exportar"
+                });
+            }
+        }
+    };
+
+    const handleBulkDeleteWithLoading = async () => {
+        if (getSelectedRoleIds) {
+            const selectedIds = getSelectedRoleIds();
+            if (selectedIds.length > 0) {
+                setLocalLoading(true);
+                try {
+                    await handleBulkDelete();
+                } finally {
+                    setLocalLoading(false);
+                }
+            } else {
+                toast.warning("Selección vacía", {
+                    description: "No hay roles seleccionados para eliminar"
+                });
+            }
         }
     };
 
@@ -128,12 +163,14 @@ export const RoleTable: React.FC = () => {
                             <ExportToExcelButton
                                 selectedCount={totalSelectedRows}
                                 onExport={handleExportToExcel}
+                                isLoading={isLoading}
                             />
                         </div>
                         <div className="w-full">
                             <BulkDeleteButton
                                 selectedCount={totalSelectedRows}
-                                onDelete={handleBulkDelete}
+                                onDelete={handleBulkDeleteWithLoading}
+                                isLoading={localLoading || isLoading}
                             />
                         </div>
                     </>
@@ -165,10 +202,12 @@ export const RoleTable: React.FC = () => {
                             <ExportToExcelButton
                                 selectedCount={totalSelectedRows}
                                 onExport={handleExportToExcel}
+                                isLoading={isLoading}
                             />
                             <BulkDeleteButton
                                 selectedCount={totalSelectedRows}
-                                onDelete={handleBulkDelete}
+                                onDelete={handleBulkDeleteWithLoading}
+                                isLoading={localLoading || isLoading}
                             />
                         </>
                     )}

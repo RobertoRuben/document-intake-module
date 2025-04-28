@@ -31,7 +31,8 @@ export const RoleTableProvider: React.FC<{ children: ReactNode }> = ({ children 
         handleEditRole: onEdit,
         handleDeleteRole: onDelete,
         handleSearchChange: onSearchChange,
-        handlePageChange: onPageChange
+        handlePageChange: onPageChange,
+        handleDeleteMultipleRoles
     } = useRoleContext();
 
     const tableHookProps = useRoleTable({
@@ -41,6 +42,7 @@ export const RoleTableProvider: React.FC<{ children: ReactNode }> = ({ children 
         searchTerm,
         onEdit,
         onDelete,
+        onBulkDelete: handleDeleteMultipleRoles, // Añadir esta línea
         onSearchChange,
         onPageChange
     });

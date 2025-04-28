@@ -25,6 +25,7 @@ export const useRoleContainerHook = () => {
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [roleToDelete, setRoleToDelete] = useState<RoleModel | undefined>(undefined);
+    const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
 
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -270,6 +271,83 @@ export const useRoleContainerHook = () => {
         setCurrentPage(page);
     }, [searchTerm]);
 
+    const handleDeleteMultipleRoles = useCallback(async (ids: number[]) => {
+        if (ids.length === 0) return;
+        
+        setIsLoading(true);
+        
+        try {
+            const result = await roleService.deleteMultipleRoles(ids);
+            toast.success("Roles eliminados", {
+                description: result.message || "Los roles han sido eliminados correctamente"
+            });
+            
+            invalidateCache();
+            fetchRoles(currentPage, searchTerm, true);
+            setSelectedRoleIds([]);
+        } catch (err) {
+            let errorMessage = "Error al eliminar los roles";
+            
+            if (err instanceof RoleOperationError) {
+                errorMessage = err.details || err.message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+            
+            setError(errorMessage);
+            toast.error("Error", {
+                description: errorMessage
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }, [currentPage, searchTerm, fetchRoles, invalidateCache]);
+
+    const handleExportToExcel = useCallback(async (ids: number[]) => {
+        if (ids.length === 0) return;
+        
+        setIsLoading(true);
+        
+        try {
+            const excelBlob = await roleService.exportRolesToExcel(ids);
+            
+            const url = window.URL.createObjectURL(excelBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            
+            const date = new Date();
+            const fileName = `${date.getDate()}${date.getMonth() + 1}${date.getFullYear()}${date.getHours()}${date.getMinutes()}.xlsx`;
+            
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            toast.success("Exportación completada", {
+                description: "Los roles han sido exportados a Excel correctamente"
+            });
+        } catch (err) {
+            let errorMessage = "Error al exportar los roles";
+            
+            if (err instanceof RoleOperationError) {
+                errorMessage = err.details || err.message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+            
+            setError(errorMessage);
+            toast.error("Error", {
+                description: errorMessage
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const handleSelectRoles = useCallback((ids: number[]) => {
+        setSelectedRoleIds(ids);
+    }, []);
+
     useEffect(() => {
         return () => {
         };
@@ -332,6 +410,7 @@ export const useRoleContainerHook = () => {
         selectedRole,
         isDeleteModalOpen,
         roleToDelete,
+        selectedRoleIds,
         isLoading,
         error,
         handleAddRole,
@@ -343,5 +422,8 @@ export const useRoleContainerHook = () => {
         handleSubmitRole,
         handleSearchChange,
         handlePageChange,
+        handleDeleteMultipleRoles,
+        handleExportToExcel,
+        handleSelectRoles,
     };
 };
