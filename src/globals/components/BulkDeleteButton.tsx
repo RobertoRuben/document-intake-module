@@ -18,7 +18,7 @@ export const BulkDeleteButton: React.FC<BulkDeleteButtonProps> = ({
   return (
     <Button 
       variant="destructive" 
-      className="flex items-center justify-center gap-2 w-full md:w-auto"
+      className="flex items-center justify-center gap-2 w-full md:w-auto hover:bg-destructive/80 transition-colors" 
       onClick={onDelete}
       disabled={isLoading}
     >
