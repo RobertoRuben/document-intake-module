@@ -188,6 +188,7 @@ export const useRoleContainerHook = () => {
                 } else {
                     fetchRoles(currentPage, searchTerm, true);
                 }
+                setIsDeleteModalOpen(false);
             } catch (err) {
                 let errorMessage = "Error al eliminar el rol";
                 
@@ -202,8 +203,6 @@ export const useRoleContainerHook = () => {
                 });
             } finally {
                 setIsLoading(false);
-                setIsDeleteModalOpen(false);
-                setRoleToDelete(undefined);
             }
         }
     }, [roleToDelete, currentPage, searchTerm, fetchRoles, invalidateCache, roles.length]);
