@@ -25,6 +25,7 @@ import { useRoleTableContext } from "@/modules/roles/context/role-table.context"
 import { useRoleContext } from "@/modules/roles/context/role.context";
 import { RoleModel } from "@/modules/roles/models/role.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
+import { DeleteModal } from "@/globals/modals/delete-modal/DeleteModal";
 import { toast } from "sonner";
 
 interface RoleTableContextType {
@@ -55,6 +56,8 @@ interface ExtendedRoleTableContext extends RoleTableContextType {
 
 export const RoleTable: React.FC = () => {
     const [localLoading, setLocalLoading] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    
     const {
         sorting,
         setSorting,
@@ -100,21 +103,26 @@ export const RoleTable: React.FC = () => {
         }
     };
 
-    const handleBulkDeleteWithLoading = async () => {
+    const handleOpenBulkDeleteModal = () => {
         if (getSelectedRoleIds) {
             const selectedIds = getSelectedRoleIds();
             if (selectedIds.length > 0) {
-                setLocalLoading(true);
-                try {
-                    await handleBulkDelete();
-                } finally {
-                    setLocalLoading(false);
-                }
+                setIsDeleteModalOpen(true);
             } else {
                 toast.warning("Selección vacía", {
                     description: "No hay roles seleccionados para eliminar"
                 });
             }
+        }
+    };
+
+    const handleBulkDeleteWithLoading = async () => {
+        setLocalLoading(true);
+        try {
+            await handleBulkDelete();
+            setIsDeleteModalOpen(false);
+        } finally {
+            setLocalLoading(false);
         }
     };
 
@@ -169,7 +177,7 @@ export const RoleTable: React.FC = () => {
                         <div className="w-full">
                             <BulkDeleteButton
                                 selectedCount={totalSelectedRows}
-                                onDelete={handleBulkDeleteWithLoading}
+                                onDelete={handleOpenBulkDeleteModal}
                                 isLoading={localLoading || isLoading}
                             />
                         </div>
@@ -206,7 +214,7 @@ export const RoleTable: React.FC = () => {
                             />
                             <BulkDeleteButton
                                 selectedCount={totalSelectedRows}
-                                onDelete={handleBulkDeleteWithLoading}
+                                onDelete={handleOpenBulkDeleteModal}
                                 isLoading={localLoading || isLoading}
                             />
                         </>
@@ -298,6 +306,20 @@ export const RoleTable: React.FC = () => {
                         });
                     }
                 }}
+            />
+            
+            {/* Modal de confirmación para eliminación masiva */}
+            <DeleteModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleBulkDeleteWithLoading}
+                title="Eliminar roles seleccionados"
+                description={`¿Estás seguro que deseas eliminar ${totalSelectedRows} ${
+                    totalSelectedRows === 1 ? "rol" : "roles"
+                } seleccionados? Esta acción no se puede deshacer.`}
+                confirmButtonText="Eliminar"
+                cancelButtonText="Cancelar"
+                isLoading={localLoading}
             />
         </div>
     );
