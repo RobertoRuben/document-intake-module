@@ -51,7 +51,7 @@ export const useRoleTable = ({
 
     const [pagination, setPagination] = useState({
         pageIndex: (paginationMeta?.currentPage || 1) - 1,
-        pageSize: paginationMeta?.perPage || 10,
+        pageSize: paginationMeta?.perPage || 5,
     });
 
     useEffect(() => {

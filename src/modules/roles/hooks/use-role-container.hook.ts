@@ -10,7 +10,7 @@ export const useRoleContainerHook = () => {
     const [roles, setRoles] = useState<RoleModel[]>([]);
     const [paginationMeta, setPaginationMeta] = useState<PaginationMetaModel>({
         currentPage: 1,
-        perPage: 10,
+        perPage: 5,
         total: 0,
         totalPages: 0,
         nextPage: null,
@@ -221,17 +221,35 @@ export const useRoleContainerHook = () => {
                 toast.success("Rol actualizado", {
                     description: "El rol ha sido actualizado correctamente"
                 });
+                invalidateCache();
+                fetchRoles(currentPage, searchTerm, true);
+                setIsModalOpen(false);
+                return true;
             } else {
                 await roleService.createRole(data);
                 toast.success("Rol creado", {
                     description: "El rol ha sido creado correctamente"
                 });
+                
+                invalidateCache();
+                
+                if (roles.length >= paginationMeta.perPage) {
+                    const newTotalItems = paginationMeta.total + 1;
+                    const newTotalPages = Math.ceil(newTotalItems / paginationMeta.perPage);
+                    
+                    if (newTotalPages > paginationMeta.totalPages) {
+                        setCurrentPage(newTotalPages);
+                        fetchRoles(newTotalPages, searchTerm, true);
+                    } else {
+                        fetchRoles(currentPage, searchTerm, true);
+                    }
+                } else {
+                    fetchRoles(currentPage, searchTerm, true);
+                }
+                
+                setIsModalOpen(false);
+                return true;
             }
-            
-            invalidateCache();
-            fetchRoles(currentPage, searchTerm, true);
-            setIsModalOpen(false);
-            return true;
         } catch (err) {
             let errorMessage = "Error al guardar el rol";
             
@@ -248,7 +266,7 @@ export const useRoleContainerHook = () => {
             setIsLoading(false);
             return false;
         }
-    }, [currentPage, searchTerm, fetchRoles, invalidateCache]);
+    }, [currentPage, searchTerm, fetchRoles, invalidateCache, roles.length, paginationMeta]);
 
     const handleSearchChange = useCallback((value: string) => {
         setSearchTerm(value);

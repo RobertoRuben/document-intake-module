@@ -287,7 +287,7 @@ export const RoleTable: React.FC = () => {
                 currentPage={table.getState().pagination.pageIndex}
                 totalPages={paginationMeta?.totalPages || 0}
                 totalItems={paginationMeta?.total || 0}
-                pageSize={paginationMeta?.perPage || 10}
+                pageSize={paginationMeta?.perPage || 5}
                 selectedCount={context.totalSelectedRows}
                 onPageChange={(pageIndex) => {
                     if (!isNaN(pageIndex) && typeof pageIndex === 'number') {
