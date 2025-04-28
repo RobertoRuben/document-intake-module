@@ -180,7 +180,14 @@ export const useRoleContainerHook = () => {
                 });
                 
                 invalidateCache();
-                fetchRoles(currentPage, searchTerm, true);
+                
+                if (roles.length === 1 && currentPage > 1) {
+                    const previousPage = currentPage - 1;
+                    setCurrentPage(previousPage);
+                    fetchRoles(previousPage, searchTerm, true);
+                } else {
+                    fetchRoles(currentPage, searchTerm, true);
+                }
             } catch (err) {
                 let errorMessage = "Error al eliminar el rol";
                 
@@ -189,7 +196,6 @@ export const useRoleContainerHook = () => {
                 } else if (err instanceof Error) {
                     errorMessage = err.message;
                 }
-                
                 setError(errorMessage);
                 toast.error("Error", {
                     description: errorMessage
@@ -200,7 +206,7 @@ export const useRoleContainerHook = () => {
                 setRoleToDelete(undefined);
             }
         }
-    }, [roleToDelete, currentPage, searchTerm, fetchRoles, invalidateCache]);
+    }, [roleToDelete, currentPage, searchTerm, fetchRoles, invalidateCache, roles.length]);
 
     const handleCancelDelete = useCallback(() => {
         setIsDeleteModalOpen(false);
@@ -301,7 +307,17 @@ export const useRoleContainerHook = () => {
             });
             
             invalidateCache();
-            fetchRoles(currentPage, searchTerm, true);
+            
+            const allItemsDeleted = ids.length >= roles.length;
+            
+            if (allItemsDeleted && currentPage > 1) {
+                const previousPage = currentPage - 1;
+                setCurrentPage(previousPage);
+                fetchRoles(previousPage, searchTerm, true);
+            } else {
+                fetchRoles(currentPage, searchTerm, true);
+            }
+            
             setSelectedRoleIds([]);
         } catch (err) {
             let errorMessage = "Error al eliminar los roles";
@@ -319,7 +335,7 @@ export const useRoleContainerHook = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [currentPage, searchTerm, fetchRoles, invalidateCache]);
+    }, [currentPage, searchTerm, fetchRoles, invalidateCache, roles.length]);
 
     const handleExportToExcel = useCallback(async (ids: number[]) => {
         if (ids.length === 0) return;
