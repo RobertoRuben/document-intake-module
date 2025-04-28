@@ -1,10 +1,10 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthHook } from '../hooks/use-auth.hook.ts';
-import { AuthModelResponse } from '../models/auth.model.response.ts';
+import { AuthResponseModel } from '../models/auth.response.model.ts';
 
 interface AuthContextType {
-    login: (username: string, password: string) => Promise<AuthModelResponse>;
+    login: (username: string, password: string) => Promise<AuthResponseModel>;
     logout: () => void;
     isAuthenticated: boolean;
     checkingAuth: boolean;

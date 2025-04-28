@@ -1,5 +1,5 @@
 import { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { authService } from '../../auth/services/auth.service.ts';
+import { authService } from '@/modules/auth/services/auth.service.ts';
 
 let isRefreshing = false;
 

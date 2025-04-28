@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { setupAuthInterceptors } from './interceptors/auth.interceptor.ts';
+import { setupAuthInterceptors } from '../interceptors/auth.interceptor.ts';
 
 const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL
