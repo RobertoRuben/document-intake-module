@@ -1,6 +1,6 @@
 import { DialogFooter } from "@/modules/core/components/ui/dialog";
-import { DepartmentCancelButton } from "./DepartmentCancelButton";
-import { DepartmentSubmitButton } from "./DepartmentSubmitButton";
+import { ModalCancelButton } from "@/globals/components/ModalCancelButton";
+import { ModalSubmitButton } from "@/globals/components/ModalSubmitButton";
 
 interface DepartmentModalFooterProps {
     isEditing: boolean;
@@ -12,10 +12,10 @@ export const DepartmentModalFooter: React.FC<DepartmentModalFooterProps> = ({ is
     return (
         <DialogFooter className="flex flex-col w-full space-y-3 sm:space-y-0">
             <div className="w-full sm:mb-3">
-                <DepartmentCancelButton onClose={onClose} />
+                <ModalCancelButton onClose={onClose} />
             </div>
             <div className="w-full">
-                <DepartmentSubmitButton isEditing={isEditing} onSubmit={onSubmit} />
+                <ModalSubmitButton isEditing={isEditing} onSubmit={onSubmit} />
             </div>
         </DialogFooter>
     );

@@ -4,6 +4,7 @@ import { Layout } from "@/modules/core/structure/layout/Layout";
 import { AuthRoutes } from "@/modules/auth/routes/auth.routes.tsx";
 import { ProtectedRoute } from "@/modules/auth/routes/protected-route.component.tsx";
 import { RoleRoutes} from "@/modules/roles/routes/role.router.tsx";
+import { DepartmentRoutes } from "@/modules/departments/routes/department.router.tsx";
 
 export function AppRouter() {
     return (
@@ -13,6 +14,7 @@ export function AppRouter() {
             <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Layout />}>
                     {RoleRoutes}
+                    {DepartmentRoutes}
                 </Route>
             </Route>
 

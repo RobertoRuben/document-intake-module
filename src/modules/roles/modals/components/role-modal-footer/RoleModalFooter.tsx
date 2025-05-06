@@ -1,6 +1,6 @@
 import { DialogFooter } from "@/modules/core/components/ui/dialog";
-import { CancelButton } from "./CancelButton";
-import { SubmitButton } from "./SubmitButton";
+import { ModalCancelButton } from "@/globals/components/ModalCancelButton";
+import { ModalSubmitButton } from "@/globals/components/ModalSubmitButton";
 
 interface RoleModalFooterProps {
     isEditing: boolean;
@@ -12,10 +12,10 @@ export const RoleModalFooter: React.FC<RoleModalFooterProps> = ({ isEditing, onC
     return (
         <DialogFooter className="flex flex-col w-full space-y-3 sm:space-y-0">
             <div className="w-full sm:mb-3">
-                <CancelButton onClose={onClose} />
+                <ModalCancelButton onClose={onClose} />
             </div>
             <div className="w-full">
-                <SubmitButton isEditing={isEditing} onSubmit={onSubmit} />
+                <ModalSubmitButton isEditing={isEditing} onSubmit={onSubmit} />
             </div>
         </DialogFooter>
     );
