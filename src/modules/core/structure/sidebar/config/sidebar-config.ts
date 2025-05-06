@@ -1,5 +1,5 @@
 import { NavItem } from '../types/sidebar.types';
-import { Settings, UserCheck } from 'lucide-react';
+import { Settings, UserCheck, Building2 } from 'lucide-react';
 
 export const navItems: NavItem[] = [
     {
@@ -10,6 +10,17 @@ export const navItems: NavItem[] = [
                 name: "Roles",
                 path: "/roles",
                 icon: UserCheck
+            }
+        ]
+    },
+    {
+        name: "Empresa",
+        icon: Building2,
+        subItems: [
+            {
+                name: "Departamentos",
+                path: "/departments",
+                icon: Building2
             }
         ]
     }
