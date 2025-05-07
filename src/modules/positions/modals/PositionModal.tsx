@@ -1,32 +1,32 @@
-import { DepartmentModalForm } from "./components/department-modal-form/DepartmentModalForm";
-import { DepartmentModel } from "../models/department.model";
+import { PositionModalForm } from "./components/position-modal-form/PositionModalForm";
+import { Position } from "../model/position.model";
 import { useEffect, useState } from "react";
 import { Dialog } from "@radix-ui/react-dialog";
 import { DialogContent } from "@/modules/core/components/ui/dialog";
-import { DepartmentModalHeader } from "./components/department-modal-header/DepartmentModalHeader";
+import { PositionModalHeader } from "./components/position-modal-header/PositionModalHeader";
 
-interface DepartmentModalProps {
+interface PositionModalProps {
     isOpen: boolean;
-    department?: DepartmentModel;
+    position?: Position;
     onClose: () => void;
-    onSubmit: (data: DepartmentModel) => Promise<boolean>;
+    onSubmit: (data: Position) => Promise<boolean>;
 }
 
-export const DepartmentModal: React.FC<DepartmentModalProps> = ({
+export const PositionModal: React.FC<PositionModalProps> = ({
     isOpen,
-    department,
+    position,
     onClose,
     onSubmit
 }) => {
 
-    const [internalDepartment, setInternalDepartment] = useState<DepartmentModel | undefined>(department);
-    const isEditing = !!internalDepartment;
+    const [internalPosition, setInternalPosition] = useState<Position | undefined>(position);
+    const isEditing = !!internalPosition;
 
     useEffect(() => {
         if (isOpen) {
-            setInternalDepartment(department);
+            setInternalPosition(position);
         }
-    }, [isOpen, department]);
+    }, [isOpen, position]);
 
     const handleOpenChange = (open: boolean) => {
         if (!open) {
@@ -39,10 +39,10 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogContent className="max-w-md w-full p-0 overflow-hidden [&>button]:hidden max-h-[90vh]">
-                <DepartmentModalHeader isEditing={isEditing} />
+                <PositionModalHeader isEditing={isEditing} />
                 <div className="max-h-[calc(90vh-130px)] overflow-y-auto">
-                    <DepartmentModalForm 
-                        department={internalDepartment}
+                    <PositionModalForm 
+                        position={internalPosition}
                         isEditing={isEditing}
                         onClose={onClose}
                         onSubmit={onSubmit}
