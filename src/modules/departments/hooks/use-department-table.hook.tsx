@@ -9,12 +9,12 @@ import {
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/modules/core/components/ui/button";
 import { Checkbox } from "@/modules/core/components/ui/checkbox";
-import { DepartmentModel } from "@/modules/departments/models/department.model";
+import { Department } from "@/modules/departments/models/department.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { formatDateLima } from "@/globals/utils/dateUtils";
 
 interface UseDepartmentTableProps {
-    departments: DepartmentModel[];
+    departments: Department[];
     dataVersion: number;
     paginationMeta: PaginationMetaModel;
     searchTerm: string;
@@ -130,7 +130,7 @@ export const useDepartmentTable = ({
         setSelectedDepartmentIds(newSelectedDepartmentIds);
     };
 
-    const columns = useMemo<ColumnDef<DepartmentModel>[]>(
+    const columns = useMemo<ColumnDef<Department>[]>(
         () => [
             {
                 id: "select",

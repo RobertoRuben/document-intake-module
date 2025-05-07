@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { departmentService, DepartmentOperationError } from "../services/department.service";
-import { DepartmentModel } from "@/modules/departments/models/department.model";
+import { Department } from "@/modules/departments/models/department.model";
 import { PaginatedDepartmentsResponseModel } from "@/modules/departments/models/department.page.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { toast } from "sonner";
 
 
 export const useDepartmentContainerHook = () => {
-    const [departments, setDepartments] = useState<DepartmentModel[]>([]);
+    const [departments, setDepartments] = useState<Department[]>([]);
     const [paginationMeta, setPaginationMeta] = useState<PaginationMetaModel>({
         currentPage: 1,
         perPage: 5,
@@ -21,10 +21,10 @@ export const useDepartmentContainerHook = () => {
     const [searchTerm, setSearchTerm] = useState("");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedDepartment, setSelectedDepartment] = useState<DepartmentModel | undefined>(undefined);
+    const [selectedDepartment, setSelectedDepartment] = useState<Department | undefined>(undefined);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [departmentToDelete, setDepartmentToDelete] = useState<DepartmentModel | undefined>(undefined);
+    const [departmentToDelete, setDepartmentToDelete] = useState<Department | undefined>(undefined);
     const [selectedDepartmentIds, setSelectedDepartmentIds] = useState<number[]>([]);
 
     const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +35,7 @@ export const useDepartmentContainerHook = () => {
     const lastFetchParamsRef = useRef<{page: number, search: string} | null>(null);
     
     const pagesCache = useRef<Record<string, {
-        data: DepartmentModel[],
+        data: Department[],
         meta: PaginationMetaModel,
         timestamp: number
     }>>({});
@@ -217,7 +217,7 @@ export const useDepartmentContainerHook = () => {
         setSelectedDepartment(undefined);
     }, []);
 
-    const handleSubmitDepartment = useCallback(async (data: DepartmentModel) => {
+    const handleSubmitDepartment = useCallback(async (data: Department) => {
         setIsLoading(true);
         
         try {
