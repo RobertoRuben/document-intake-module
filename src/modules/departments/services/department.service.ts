@@ -1,6 +1,6 @@
 import axiosInstance from "../../../globals/config/axios-config";
 import { camelizeKeys, decamelizeKeys } from "humps";
-import { DepartmentModel } from "@/modules/departments/models/department.model";
+import { Department } from "@/modules/departments/models/department.model";
 import { PaginatedDepartmentsResponseModel } from "@/modules/departments/models/department.page.model";
 import axios, { AxiosError } from "axios";
 
@@ -61,10 +61,10 @@ export class DepartmentService {
    * Gets all departments
    * @returns List of departments
    */
-  async getAllDepartments(): Promise<DepartmentModel[]> {
+  async getAllDepartments(): Promise<Department[]> {
     try {
       const response = await axiosInstance.get<unknown>("/department");
-      return camelizeKeys(response.data) as DepartmentModel[];
+      return camelizeKeys(response.data) as Department[];
     } catch (error) {
       throw this.handleApiError(error);
     }
@@ -120,10 +120,10 @@ export class DepartmentService {
    * @param id Department ID
    * @returns Department data
    */
-  async getDepartmentById(id: number): Promise<DepartmentModel> {
+  async getDepartmentById(id: number): Promise<Department> {
     try {
       const response = await axiosInstance.get<unknown>(`/department/${id}`);
-      return camelizeKeys(response.data) as DepartmentModel;
+      return camelizeKeys(response.data) as Department;
     } catch (error) {
       throw this.handleApiError(error);
     }
@@ -135,15 +135,15 @@ export class DepartmentService {
    * @returns Created department
    */
   async createDepartment(
-    department: DepartmentModel
-  ): Promise<DepartmentModel> {
+    department: Department
+  ): Promise<Department> {
     try {
       const payload = decamelizeKeys(department);
       const response = await axiosInstance.post<unknown>(
         "/department",
         payload
       );
-      return camelizeKeys(response.data) as DepartmentModel;
+      return camelizeKeys(response.data) as Department;
     } catch (error) {
       throw this.handleApiError(error);
     }
@@ -157,15 +157,15 @@ export class DepartmentService {
    */
   async updateDepartment(
     id: number,
-    department: DepartmentModel
-  ): Promise<DepartmentModel> {
+    department: Department
+  ): Promise<Department> {
     try {
       const payload = decamelizeKeys(department);
       const response = await axiosInstance.put<unknown>(
         `/department/${id}`,
         payload
       );
-      return camelizeKeys(response.data) as DepartmentModel;
+      return camelizeKeys(response.data) as Department;
     } catch (error) {
       throw this.handleApiError(error);
     }
