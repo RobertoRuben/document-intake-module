@@ -3,15 +3,17 @@ import { Employee } from "../models/employee.model";
 import { useEffect, useState } from "react";
 import { Dialog } from "@radix-ui/react-dialog";
 import { DialogContent } from "@/modules/core/components/ui/dialog";
-import { EmployeeModalHeader } from "./components/employee-modal-header/EnployeeModalHeader";
+import { EmployeeModalHeader } from "./components/employee-modal-header/EmployeeModalHeader";
+import { Position } from "@/modules/positions/model/position.model";
+import { Department } from "@/modules/departments/models/department.model";
 
 interface EmployeeModalProps {
     isOpen: boolean;
     employee?: Employee;
     onClose: () => void;
     onSubmit: (data: Employee) => Promise<boolean>;
-    positions: { id: number; name: string }[];
-    departments: { id: number; name: string }[];
+    positions: Position[];
+    departments: Department[];
 }
 
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
@@ -39,6 +41,18 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
         }
     };
 
+    // Transforma Position[] en {id: number, name: string}[]
+    const positionsForDropdown = positions.map(position => ({
+        id: position.id || 0,
+        name: position.name
+    }));
+
+    // Transforma Department[] en {id: number, name: string}[]
+    const departmentsForDropdown = departments.map(department => ({
+        id: department.id || 0,
+        name: department.name
+    }));
+
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogContent className="max-w-2xl w-full p-0 overflow-hidden [&>button]:hidden max-h-[90vh]">
@@ -49,8 +63,8 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
                         isEditing={isEditing}
                         onClose={onClose}
                         onSubmit={onSubmit}
-                        positions={positions}
-                        departments={departments}
+                        positions={positionsForDropdown}
+                        departments={departmentsForDropdown}
                     />
                 </div>
             </DialogContent>
