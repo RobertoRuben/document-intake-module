@@ -1,13 +1,19 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { employeeService } from "../services/employee.service";
+import { positionService } from "@/modules/positions/service/position.service";
+import { departmentService } from "@/modules/departments/services/department.service"; 
 import { AppOperationError } from "@/globals/exceptions/api-error.handler";
 import { Employee } from "../models/employee.model";
+import { Position } from "@/modules/positions/model/position.model";
+import { Department } from "@/modules/departments/models/department.model";
 import { PaginatedEmployeesResponseModel } from "../models/employe-page.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { toast } from "sonner";
 
 export const useEmployeeContainerHook = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
+    const [positions, setPositions] = useState<Position[]>([]);
+    const [departments, setDepartments] = useState<Department[]>([]);
     const [paginationMeta, setPaginationMeta] = useState<PaginationMetaModel>({
         currentPage: 1,
         perPage: 5,
@@ -116,8 +122,34 @@ export const useEmployeeContainerHook = () => {
         pagesCache.current = {};
     }, []);
 
+    const fetchPositionsAndDepartments = useCallback(async () => {
+        try {
+            const [positionsData, departmentsData] = await Promise.all([
+                positionService.getAllPositions(),
+                departmentService.getAllDepartments()
+            ]);
+            
+            setPositions(positionsData);
+            setDepartments(departmentsData);
+        } catch (err) {
+            let errorMessage = "Error al cargar los datos de referencia";
+            
+            if (err instanceof AppOperationError) {
+                errorMessage = err.details || err.message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+            
+            console.error(errorMessage);
+            toast.error("Error", {
+                description: errorMessage,
+            });
+        }
+    }, []);
+
     useEffect(() => {
         fetchEmployees(1, "");
+        fetchPositionsAndDepartments();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -434,6 +466,8 @@ export const useEmployeeContainerHook = () => {
 
     return {
         employees,
+        positions,
+        departments,
         paginationMeta,
         dataVersion,
         currentPage,
