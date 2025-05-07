@@ -2,7 +2,7 @@ import axiosInstance from "../../../globals/config/axios-config";
 import { camelizeKeys, decamelizeKeys } from "humps";
 import { Position } from "@/modules/positions/model/position.model";
 import { PaginatedPositionsResponseModel } from "@/modules/positions/model/position.page.model";
-import { ApiErrorHandler } from "@/globals/exception/api-error.handler";
+import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
 
 /**
  * Service for managing system positions
