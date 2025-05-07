@@ -1,11 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { TableCell } from "@/modules/core/components/ui/table";
-import { DepartmentModel } from "@/modules/departments/models/department.model";
+import { Department } from "@/modules/departments/models/department.model";
 import { TableActions } from "@/globals/components/TableActions";
 
 interface DepartmentTableRowProps {
-    department: DepartmentModel;
+    department: Department;
     index: number;
     onEdit: (id?: number) => void;
     onDelete: (id?: number) => void;

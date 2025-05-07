@@ -1,11 +1,11 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { useDepartmentTable } from "../hooks/use-department-table.hook";
 import { useDepartmentContext } from "./department.context";
-import { DepartmentModel } from "../models/department.model";
+import { Department } from "../models/department.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model.ts";
 
 interface DepartmentTableContextType {
-    departments: DepartmentModel[];
+    departments: Department[];
     paginationMeta: PaginationMetaModel;
     dataVersion: number;
     currentPage: number;

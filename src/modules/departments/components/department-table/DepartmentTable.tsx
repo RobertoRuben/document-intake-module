@@ -17,7 +17,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/modules/core/components/ui/table";
 import { useDepartmentTableContext } from "@/modules/departments/context/department-table.context";
 import { useDepartmentContext } from "@/modules/departments/context/department.context";
-import { DepartmentModel } from "@/modules/departments/models/department.model";
+import { Department } from "@/modules/departments/models/department.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { DeleteModal } from "@/globals/modals/delete-modal/DeleteModal";
 import { toast } from "sonner";
@@ -40,14 +40,14 @@ interface DepartmentTableContextType {
     totalSelectedRows: number; 
     pagination: PaginationState;
     setPagination: OnChangeFn<PaginationState>;
-    columns: ColumnDef<DepartmentModel, unknown>[];
+    columns: ColumnDef<Department, unknown>[];
     tableVariants: Variants;
     dataVersion: number;
     searchTerm: string;
     onSearchChange: (value: string) => void;
     handleBulkDelete: () => Promise<void>;
     getSelectedDepartmentIds?: () => number[];
-    departments: DepartmentModel[];
+    departments: Department[];
     paginationMeta: PaginationMetaModel;
 }
 
