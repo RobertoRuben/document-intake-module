@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Employee } from "../../models/employee.model";
-import { employeeFormSchema, EmployeeFormValues } from "../../validators/employee.validator.schema";
+import { employeeFormSchema, EmployeeFormValues } from "../validators/employee.validator.schema";
 
 export const useEmployeeForm = (employee?: Employee) => {
     const form = useForm<EmployeeFormValues>({
