@@ -1,7 +1,23 @@
 import { NavItem } from '../types/sidebar.types';
-import { Settings, UserCheck, Building2 } from 'lucide-react';
+import { Settings, UserCheck, Building2, Briefcase, BadgeCheck } from 'lucide-react';
 
 export const navItems: NavItem[] = [
+    {
+        name: "Empresa",
+        icon: Briefcase,
+        subItems: [
+            {
+                name: "Departamentos",
+                path: "/departments",
+                icon: Building2
+            },
+            {
+                name: "Cargos",
+                path: "/positions",
+                icon: BadgeCheck
+            }
+        ]
+    },
     {
         name: "Sistema",
         icon: Settings,
@@ -13,15 +29,4 @@ export const navItems: NavItem[] = [
             }
         ]
     },
-    {
-        name: "Empresa",
-        icon: Building2,
-        subItems: [
-            {
-                name: "Departamentos",
-                path: "/departments",
-                icon: Building2
-            }
-        ]
-    }
 ];
