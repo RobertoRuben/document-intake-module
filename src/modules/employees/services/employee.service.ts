@@ -8,13 +8,15 @@ import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
  * Service for managing system employees
  */
 export class EmployeeService {
+  private readonly baseEndpoint = "/employees";
+
   /**
    * Gets all employees
    * @returns List of employees
    */
   async getAllEmployees(): Promise<Employee[]> {
     try {
-      const response = await axiosInstance.get<unknown>("/employee");
+      const response = await axiosInstance.get<unknown>(this.baseEndpoint);
       return camelizeKeys(response.data) as Employee[];
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "EmployeeOperationError");
@@ -33,7 +35,7 @@ export class EmployeeService {
   ): Promise<PaginatedEmployeesResponseModel> {
     try {
       const response = await axiosInstance.get<unknown>(
-        `/employee/paginated?page=${page}&size=${size}`
+        `${this.baseEndpoint}/paginated?page=${page}&size=${size}`
       );
       const paginatedResult = camelizeKeys(
         response.data
@@ -58,7 +60,7 @@ export class EmployeeService {
   ): Promise<PaginatedEmployeesResponseModel> {
     try {
       const response = await axiosInstance.get<unknown>(
-        `/employee/search?search_term=${searchTerm}&page=${page}&size=${size}`
+        `${this.baseEndpoint}/search?search_term=${searchTerm}&page=${page}&size=${size}`
       );
       return camelizeKeys(response.data) as PaginatedEmployeesResponseModel;
     } catch (error) {
@@ -73,7 +75,7 @@ export class EmployeeService {
    */
   async getEmployeeById(id: number): Promise<Employee> {
     try {
-      const response = await axiosInstance.get<unknown>(`/employee/${id}`);
+      const response = await axiosInstance.get<unknown>(`${this.baseEndpoint}/${id}`);
       return camelizeKeys(response.data) as Employee;
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "EmployeeOperationError");
@@ -88,7 +90,7 @@ export class EmployeeService {
   async createEmployee(employee: Employee): Promise<Employee> {
     try {
       const payload = decamelizeKeys(employee);
-      const response = await axiosInstance.post<unknown>("/employee", payload);
+      const response = await axiosInstance.post<unknown>(this.baseEndpoint, payload);
       return camelizeKeys(response.data) as Employee;
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "EmployeeOperationError");
@@ -104,7 +106,7 @@ export class EmployeeService {
   async updateEmployee(id: number, employee: Employee): Promise<Employee> {
     try {
       const payload = decamelizeKeys(employee);
-      const response = await axiosInstance.put<unknown>(`/employee/${id}`, payload);
+      const response = await axiosInstance.put<unknown>(`${this.baseEndpoint}/${id}`, payload);
       return camelizeKeys(response.data) as Employee;
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "EmployeeOperationError");
@@ -118,7 +120,7 @@ export class EmployeeService {
    */
   async deleteEmployee(id: number): Promise<{ message: string }> {
     try {
-      const response = await axiosInstance.delete<unknown>(`/employee/${id}`);
+      const response = await axiosInstance.delete<unknown>(`${this.baseEndpoint}/${id}`);
       return camelizeKeys(response.data) as { message: string };
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "EmployeeOperationError");
@@ -133,7 +135,7 @@ export class EmployeeService {
   async deleteMultipleEmployees(ids: number[]): Promise<{ message: string }> {
     try {
       const response = await axiosInstance.post<unknown>(
-        "/employee/delete-multiple",
+        `${this.baseEndpoint}/delete-multiple`,
         ids
       );
       return camelizeKeys(response.data) as { message: string };
@@ -149,7 +151,7 @@ export class EmployeeService {
    */
   async exportEmployeesToExcel(ids: number[]): Promise<Blob> {
     try {
-      const response = await axiosInstance.post("/employee/export-excel", ids, {
+      const response = await axiosInstance.post(`${this.baseEndpoint}/export-excel`, ids, {
         responseType: "blob",
       });
       return new Blob([response.data], {
