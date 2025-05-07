@@ -3,7 +3,7 @@ import { DepartmentModel } from "../models/department.model";
 import { useEffect, useState } from "react";
 import { Dialog } from "@radix-ui/react-dialog";
 import { DialogContent } from "@/modules/core/components/ui/dialog";
-import { RoleModalHeader } from "@/modules/roles/modals/components/role-modal-header/RoleModalHeader";
+import { DepartmentModalHeader } from "./components/department-modal-header/DepartmentModalHeader";
 
 interface DepartmentModalProps {
     isOpen: boolean;
@@ -39,7 +39,7 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogContent className="max-w-md w-full p-0 overflow-hidden [&>button]:hidden max-h-[90vh]">
-                <RoleModalHeader isEditing={isEditing} />
+                <DepartmentModalHeader isEditing={isEditing} />
                 <div className="max-h-[calc(90vh-130px)] overflow-y-auto">
                     <DepartmentModalForm 
                         department={internalDepartment}
