@@ -4,7 +4,7 @@ import { Employee } from "@/modules/employees/models/employee.model";
 import { EmployeeModalFooter } from "../employee-modal-footer/EmployeeModalFooter";
 import { EmployeeFormFields } from "./EmployeeFormFields";
 import { useEmployeeForm } from "../../hooks/use-employee.hook";
-import { EmployeeFormValues } from "@/modules/employees/modals/validators/employee.validator.schema";
+import { EmployeeFormValues } from "@/modules/employees/validators/employee.validator.schema";
 
 interface EmployeeModalFormProps {
     employee?: Employee;

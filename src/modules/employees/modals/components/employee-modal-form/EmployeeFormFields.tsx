@@ -8,7 +8,7 @@ import {
     FormMessage,
 } from "@/modules/core/components/ui/form";
 import { Input } from "@/modules/core/components/ui/input";
-import { EmployeeFormValues } from "../../validators/employee.validator.schema";
+import { EmployeeFormValues } from "../../../validators/employee.validator.schema";
 import { DropdownSearchable } from "@/modules/core/components/ui/dropdown-searchable";
 import {
     Select,
