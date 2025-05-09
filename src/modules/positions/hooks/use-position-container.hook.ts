@@ -347,7 +347,7 @@ export const usePositionContainerHook = () => {
             link.href = url;
             
             const date = new Date();
-            const fileName = `cargos_${date.getDate()}${date.getMonth() + 1}${date.getFullYear()}${date.getHours()}${date.getMinutes()}.xlsx`;
+            const fileName = `${date.getDate()}${date.getMonth() + 1}${date.getFullYear()}${date.getHours()}${date.getMinutes()}.xlsx`;
             
             link.setAttribute('download', fileName);
             document.body.appendChild(link);
