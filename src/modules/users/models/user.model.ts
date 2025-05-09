@@ -4,9 +4,9 @@ export enum UserStatus {
 }
 
 export interface User {
-    id: number;
+    id?: number;
     username: string;
-    password: string;
+    password?: string;
     isActive: UserStatus;
     roleId?: number;
     roleName?: string;
