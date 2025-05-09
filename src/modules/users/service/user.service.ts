@@ -143,15 +143,13 @@ export class UserService {
    */
   async changeUserStatus(id: number, status: UserStatus | boolean): Promise<User> {
     try {
-      // Si status es booleano, convertirlo a UserStatus
       const userStatus = typeof status === 'boolean'
         ? status ? UserStatus.ACTIVATE : UserStatus.DEACTIVATE
         : status;
         
-      // Enviar el status como un parámetro de consulta
       const response = await axiosInstance.patch<unknown>(
         `${this.baseEndpoint}/${id}/status?status=${userStatus}`,
-        {} // Cuerpo vacío, ya que enviamos el status como parámetro de consulta
+        {} 
       );
       return camelizeKeys(response.data) as User;
     } catch (error) {
