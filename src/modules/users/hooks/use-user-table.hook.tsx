@@ -135,9 +135,20 @@ export const useUserTable = ({
         }
         
         setSelectedUserIds(newSelectedUserIds);
-    };
-
-    const formatStatus = (status: UserStatus) => {
+    };    const formatStatus = (status: UserStatus | boolean) => {
+        if (typeof status === 'boolean') {
+            return status ? (
+                <Badge className="bg-green-600 hover:bg-green-700">
+                    Activo
+                </Badge>
+            ) : (
+                <Badge className="bg-red-600 hover:bg-red-700">
+                    Inactivo
+                </Badge>
+            );
+        }
+        
+        // Manejo de valores de enumeración
         switch (status) {
             case UserStatus.ACTIVATE:
                 return (
@@ -333,12 +344,14 @@ export const useUserTable = ({
                 ),
                 cell: ({ row }) => <div>{formatDateLima(row.original.updatedAt)}</div>,
             },
-            {
-                id: "actions",
+            {                id: "actions",
                 header: () => <div className="text-right">Acciones</div>,
                 cell: ({ row }) => {
                     const user = row.original;
-                    const isActive = user.isActive === UserStatus.ACTIVATE;
+                    // Verificar si isActive es booleano o UserStatus
+                    const isActive = typeof user.isActive === 'boolean' 
+                        ? user.isActive 
+                        : user.isActive === UserStatus.ACTIVATE;
                     
                     return (
                         <div className="text-right space-x-2">

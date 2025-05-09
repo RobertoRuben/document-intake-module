@@ -7,7 +7,7 @@ export interface User {
     id?: number;
     username: string;
     password?: string;
-    isActive: UserStatus;
+    isActive: UserStatus | boolean;
     roleId?: number;
     roleName?: string;
     employeeId?: number;

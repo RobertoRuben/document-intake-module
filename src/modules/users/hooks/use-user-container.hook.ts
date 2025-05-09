@@ -344,18 +344,22 @@ export const useUserContainerHook = () => {
       paginationMeta,
     ]
   );
-
   const handleChangeUserStatus = useCallback(
-    async (id: number, status: UserStatus) => {
+    async (id: number, status: UserStatus | boolean) => {
       if (!id) return;
 
       setIsLoading(true);
 
       try {
-        await userService.changeUserStatus(id, status);
+        // Determinar el estado real basado en el tipo de status
+        const actualStatus = typeof status === 'boolean'
+          ? status ? UserStatus.ACTIVATE : UserStatus.DEACTIVATE
+          : status;
+        
+        await userService.changeUserStatus(id, actualStatus);
 
         const statusText =
-          status === UserStatus.ACTIVATE ? "activado" : "desactivado";
+          actualStatus === UserStatus.ACTIVATE ? "activado" : "desactivado";
 
         toast.success(`Usuario ${statusText}`, {
           description: `El usuario ha sido ${statusText} correctamente`,

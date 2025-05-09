@@ -30,9 +30,20 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
         ...(onView ? [{ type: 'view' as const, onClick: () => onView(user.id) }] : []),
         { type: 'edit' as const, onClick: () => onEdit(user.id) },
         { type: 'delete' as const, onClick: () => onDelete(user.id) }
-    ];
-
-    const formatStatus = (status: UserStatus) => {
+    ];    const formatStatus = (status: UserStatus | boolean) => {
+        if (typeof status === 'boolean') {
+            return status ? (
+                <Badge className="bg-green-600 hover:bg-green-700">
+                    Activo
+                </Badge>
+            ) : (
+                <Badge className="bg-red-600 hover:bg-red-700">
+                    Inactivo
+                </Badge>
+            );
+        }
+        
+        // Manejo de valores de enumeración
         switch (status) {
             case UserStatus.ACTIVATE:
                 return (

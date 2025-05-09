@@ -135,20 +135,23 @@ export class UserService {
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "UserOperationError");
     }
-  }
-
-  /**
+  }  /**
    * Changes the user status (activate/deactivate)
    * @param id ID of the user
    * @param status New status
    * @returns Updated user
    */
-  async changeUserStatus(id: number, status: UserStatus): Promise<User> {
+  async changeUserStatus(id: number, status: UserStatus | boolean): Promise<User> {
     try {
-      const payload = decamelizeKeys({ isActive: status });
+      // Si status es booleano, convertirlo a UserStatus
+      const userStatus = typeof status === 'boolean'
+        ? status ? UserStatus.ACTIVATE : UserStatus.DEACTIVATE
+        : status;
+        
+      // Enviar el status como un parámetro de consulta
       const response = await axiosInstance.patch<unknown>(
-        `${this.baseEndpoint}/${id}/status`,
-        payload
+        `${this.baseEndpoint}/${id}/status?status=${userStatus}`,
+        {} // Cuerpo vacío, ya que enviamos el status como parámetro de consulta
       );
       return camelizeKeys(response.data) as User;
     } catch (error) {
