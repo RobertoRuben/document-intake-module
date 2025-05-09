@@ -1,11 +1,11 @@
 import React, { createContext, useContext, ReactNode } from "react";
-import { useDepartmentTable } from "../hooks/use-department-table.hook";
-import { useDepartmentContext } from "./department.context";
-import { Department } from "../models/department.model";
-import { PaginationMetaModel } from "@/globals/models/pagination.model.ts";
+import { useEmployeeTable } from "../hooks/use-employee-table.hook";
+import { useEmployeeContext } from "./employee.context";
+import { Employee } from "../models/employee.model";
+import { PaginationMetaModel } from "@/globals/models/pagination.model";
 
-interface DepartmentTableContextType {
-    departments: Department[];
+interface EmployeeTableContextType {
+    employees: Employee[];
     paginationMeta: PaginationMetaModel;
     dataVersion: number;
     currentPage: number;
@@ -18,31 +18,31 @@ interface DepartmentTableContextType {
     [key: string]: unknown;
 }
 
-const DepartmentTableContext = createContext<DepartmentTableContextType | undefined>(undefined);
+const EmployeeTableContext = createContext<EmployeeTableContextType | undefined>(undefined);
 
-export const DepartmentTableProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const EmployeeTableProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const {
-        departments,
+        employees,
         paginationMeta,
         dataVersion,
         currentPage,
         searchTerm,
         isLoading,
-        handleEditDepartment: onEdit,
-        handleDeleteDepartment: onDelete,
+        handleEditEmployee: onEdit,
+        handleDeleteEmployee: onDelete,
         handleSearchChange: onSearchChange,
         handlePageChange: onPageChange,
-        handleDeleteMultipleDepartments
-    } = useDepartmentContext();
+        handleDeleteMultipleEmployees
+    } = useEmployeeContext();
 
-    const tableHookProps = useDepartmentTable({
-        departments,
+    const tableHookProps = useEmployeeTable({
+        employees,
         dataVersion,
         paginationMeta,
         searchTerm,
         onEdit,
         onDelete,
-        onBulkDelete: handleDeleteMultipleDepartments,
+        onBulkDelete: handleDeleteMultipleEmployees,
         onSearchChange,
         onPageChange
     });
@@ -50,8 +50,8 @@ export const DepartmentTableProvider: React.FC<{ children: ReactNode }> = ({ chi
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { dataVersion: dataVersionDup, searchTerm: searchTermDup, onSearchChange: onSearchChangeDup, ...restTableHookProps } = tableHookProps;
 
-    const value: DepartmentTableContextType = {
-        departments,
+    const value: EmployeeTableContextType = {
+        employees,
         paginationMeta,
         dataVersion,
         currentPage,
@@ -65,16 +65,16 @@ export const DepartmentTableProvider: React.FC<{ children: ReactNode }> = ({ chi
     };
 
     return (
-        <DepartmentTableContext.Provider value={value}>
+        <EmployeeTableContext.Provider value={value}>
             {children}
-        </DepartmentTableContext.Provider>
+        </EmployeeTableContext.Provider>
     );
 };
 
-export const useDepartmentTableContext = (): DepartmentTableContextType => {
-    const context = useContext(DepartmentTableContext);
+export const useEmployeeTableContext = (): EmployeeTableContextType => {
+    const context = useContext(EmployeeTableContext);
     if (context === undefined) {
-        throw new Error("useDepartmentTableContext debe usarse dentro de un DepartmentTableProvider");
+        throw new Error("useEmployeeTableContext debe usarse dentro de un EmployeeTableProvider");
     }
     return context;
 };

@@ -9,12 +9,12 @@ import {
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/modules/core/components/ui/button";
 import { Checkbox } from "@/modules/core/components/ui/checkbox";
-import { Department } from "@/modules/departments/models/department.model";
+import { Employee } from "@/modules/employees/models/employee.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { formatDateLima } from "@/globals/utils/dateUtils";
 
-interface UseDepartmentTableProps {
-    departments: Department[];
+interface UseEmployeeTableProps {
+    employees: Employee[];
     dataVersion: number;
     paginationMeta: PaginationMetaModel;
     searchTerm: string;
@@ -25,26 +25,30 @@ interface UseDepartmentTableProps {
     onPageChange: (page: number) => void;
 }
 
-export const useDepartmentTable = ({
-                                 departments,
-                                 dataVersion,
-                                 paginationMeta,
-                                 searchTerm,
-                                 onEdit,
-                                 onDelete,
-                                 onBulkDelete,
-                                 onSearchChange,
-                                 onPageChange,
-                             }: UseDepartmentTableProps) => {
+export const useEmployeeTable = ({
+    employees,
+    dataVersion,
+    paginationMeta,
+    searchTerm,
+    onEdit,
+    onDelete,
+    onBulkDelete,
+    onSearchChange,
+    onPageChange,
+}: UseEmployeeTableProps) => {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
         createdAt: false,
         updatedAt: false,
+        gender: true,
+        names: true,
+        paternalSurname: true,
+        maternalSurname: true,
         actions: true,
     });
     
-    const [selectedDepartmentIds, setSelectedDepartmentIds] = useState<Record<number, boolean>>({});
+    const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<Record<number, boolean>>({});
     const [totalSelectedRows, setTotalSelectedRows] = useState<number>(0);
     const [allSelected, setAllSelected] = useState<boolean>(false);
 
@@ -62,75 +66,86 @@ export const useDepartmentTable = ({
 
     const rowSelection = useMemo(() => {
         const selection: RowSelectionState = {};
-        departments.forEach((department, index) => {
-            if (department.id !== undefined && (selectedDepartmentIds[department.id] || allSelected)) {
+        employees.forEach((employee, index) => {
+            if (employee.id !== undefined && (selectedEmployeeIds[employee.id] || allSelected)) {
                 selection[index] = true;
             }
         });
         return selection;
-    }, [departments, selectedDepartmentIds, allSelected]);
+    }, [employees, selectedEmployeeIds, allSelected]);
 
     useEffect(() => {
         if (allSelected && paginationMeta?.total) {
             setTotalSelectedRows(paginationMeta.total);
         } else {
-            const selectedCount = Object.values(selectedDepartmentIds).filter(Boolean).length;
+            const selectedCount = Object.values(selectedEmployeeIds).filter(Boolean).length;
             setTotalSelectedRows(selectedCount);
         }
-    }, [selectedDepartmentIds, paginationMeta?.total, allSelected]);
+    }, [selectedEmployeeIds, paginationMeta?.total, allSelected]);
 
-    const getSelectedDepartmentIds = (): number[] => {
+    const getSelectedEmployeeIds = (): number[] => {
         if (allSelected) {
-            return departments.map(department => department.id as number);
+            return employees.map(employee => employee.id as number);
         } else {
-            return Object.keys(selectedDepartmentIds)
-                .filter(id => selectedDepartmentIds[Number(id)])
+            return Object.keys(selectedEmployeeIds)
+                .filter(id => selectedEmployeeIds[Number(id)])
                 .map(id => Number(id));
         }
     };
 
     const handleBulkDelete = () => {
-        const selectedIds = getSelectedDepartmentIds();
+        const selectedIds = getSelectedEmployeeIds();
         if (onBulkDelete && selectedIds.length > 0) {
             onBulkDelete(selectedIds);
             setAllSelected(false);
-            setSelectedDepartmentIds({});
+            setSelectedEmployeeIds({});
             setTotalSelectedRows(0);
         } else {
-            console.warn("Función onBulkDelete no proporcionada o no hay departamentos seleccionados");
+            console.warn("Función onBulkDelete no proporcionada o no hay empleados seleccionados");
         }
     };
 
     const handleRowSelectionChange = (newSelection: RowSelectionState) => {
-        const newSelectedDepartmentIds = { ...selectedDepartmentIds };
+        const newSelectedEmployeeIds = { ...selectedEmployeeIds };
         
         Object.entries(newSelection).forEach(([indexStr, isSelected]) => {
             const index = parseInt(indexStr, 10);
-            const department = departments[index];
+            const employee = employees[index];
             
-            if (department && typeof department.id === 'number') {
+            if (employee && typeof employee.id === 'number') {
                 if (isSelected) {
-                    newSelectedDepartmentIds[department.id] = true;
+                    newSelectedEmployeeIds[employee.id] = true;
                 } else {
-                    delete newSelectedDepartmentIds[department.id];
+                    delete newSelectedEmployeeIds[employee.id];
                 }
             }
         });
         
         const allCurrentPageSelected = 
-            departments.length > 0 && 
-            departments.every(department => typeof department.id === 'number' && newSelectedDepartmentIds[department.id]);
+            employees.length > 0 && 
+            employees.every(employee => typeof employee.id === 'number' && newSelectedEmployeeIds[employee.id]);
             
-        if (allCurrentPageSelected && Object.keys(newSelectedDepartmentIds).length === paginationMeta?.total) {
+        if (allCurrentPageSelected && Object.keys(newSelectedEmployeeIds).length === paginationMeta?.total) {
             setAllSelected(true);
-        } else if (Object.keys(newSelectedDepartmentIds).length === 0) {
+        } else if (Object.keys(newSelectedEmployeeIds).length === 0) {
             setAllSelected(false);
         }
         
-        setSelectedDepartmentIds(newSelectedDepartmentIds);
+        setSelectedEmployeeIds(newSelectedEmployeeIds);
     };
 
-    const columns = useMemo<ColumnDef<Department>[]>(
+    const formatGender = (gender: string) => {
+        switch (gender) {
+            case 'Male':
+                return 'Masculino';
+            case 'Female':
+                return 'Femenino';
+            default:
+                return 'Otro';
+        }
+    };
+
+    const columns = useMemo<ColumnDef<Employee>[]>(
         () => [
             {
                 id: "select",
@@ -151,7 +166,7 @@ export const useDepartmentTable = ({
                                 }
                             } else {
                                 setAllSelected(false);
-                                setSelectedDepartmentIds({});
+                                setSelectedEmployeeIds({});
                                 setTotalSelectedRows(0);
                             }
                         }}
@@ -159,23 +174,23 @@ export const useDepartmentTable = ({
                     />
                 ),
                 cell: ({ row }) => {
-                    const department = row.original;
+                    const employee = row.original;
                     return (
                         <Checkbox
-                            checked={allSelected || (department.id !== undefined && selectedDepartmentIds[department.id] === true)}
+                            checked={allSelected || (employee.id !== undefined && selectedEmployeeIds[employee.id] === true)}
                             onCheckedChange={(value) => {
                                 row.toggleSelected(!!value);
                                 
                                 if (value) {
-                                    if (typeof department.id === 'number') {
-                                        const id = department.id;
-                                        setSelectedDepartmentIds(prev => ({ ...prev, [id.toString()]: true }));
+                                    if (typeof employee.id === 'number') {
+                                        const id = employee.id;
+                                        setSelectedEmployeeIds(prev => ({ ...prev, [id.toString()]: true }));
                                     }
                                 } else {
-                                    setSelectedDepartmentIds(prev => {
+                                    setSelectedEmployeeIds(prev => {
                                         const updated = { ...prev };
-                                        if (typeof department.id === 'number') {
-                                            delete updated[department.id];
+                                        if (typeof employee.id === 'number') {
+                                            delete updated[employee.id];
                                         }
                                         return updated;
                                     });
@@ -211,18 +226,106 @@ export const useDepartmentTable = ({
                 ),
             },
             {
-                accessorKey: "name",
+                accessorKey: "dni",
                 header: ({ column }) => (
                     <Button
                         variant="ghost"
                         className="px-0 font-bold"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
-                        Nombre
+                        DNI
                         <ArrowUpDown className="ml-1 h-4 w-4" />
                     </Button>
                 ),
-                cell: ({ row }) => <div>{row.original.name}</div>,
+                cell: ({ row }) => <div>{row.original.dni}</div>,
+            },
+            {
+                accessorKey: "paternalSurname",
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        className="px-0 font-bold"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Apellido Paterno
+                        <ArrowUpDown className="ml-1 h-4 w-4" />
+                    </Button>
+                ),
+                cell: ({ row }) => <div>{row.original.paternalSurname}</div>,
+                enableHiding: true,
+            },
+            {
+                accessorKey: "maternalSurname",
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        className="px-0 font-bold"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Apellido Materno
+                        <ArrowUpDown className="ml-1 h-4 w-4" />
+                    </Button>
+                ),
+                cell: ({ row }) => <div>{row.original.maternalSurname}</div>,
+                enableHiding: true,
+            },
+            {
+                accessorKey: "names",
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        className="px-0 font-bold"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Nombres
+                        <ArrowUpDown className="ml-1 h-4 w-4" />
+                    </Button>
+                ),
+                cell: ({ row }) => <div>{row.original.names}</div>,
+                enableHiding: true,
+            },
+            {
+                accessorKey: "gender",
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        className="px-0 font-bold"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Género
+                        <ArrowUpDown className="ml-1 h-4 w-4" />
+                    </Button>
+                ),
+                cell: ({ row }) => <div>{formatGender(row.original.gender)}</div>,
+                enableHiding: true,
+            },
+            {
+                accessorKey: "departmentName",
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        className="px-0 font-bold"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Área
+                        <ArrowUpDown className="ml-1 h-4 w-4" />
+                    </Button>
+                ),
+                cell: ({ row }) => <div>{row.original.departmentName || 'No asignado'}</div>,
+            },
+            {
+                accessorKey: "positionName",
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        className="px-0 font-bold"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Cargo
+                        <ArrowUpDown className="ml-1 h-4 w-4" />
+                    </Button>
+                ),
+                cell: ({ row }) => <div>{row.original.positionName || 'No asignado'}</div>,
             },
             {
                 accessorKey: "createdAt",
@@ -274,12 +377,17 @@ export const useDepartmentTable = ({
                 enableSorting: false,
             },
         ],
-        [onEdit, onDelete, allSelected, paginationMeta?.total, selectedDepartmentIds]
+        [onEdit, onDelete, allSelected, paginationMeta?.total, selectedEmployeeIds]
     );
 
     useEffect(() => {
         if (searchTerm) {
-            setColumnFilters([{ id: "name", value: searchTerm }]);
+            setColumnFilters([
+                { id: "names", value: searchTerm },
+                { id: "paternalSurname", value: searchTerm },
+                { id: "maternalSurname", value: searchTerm },
+                { id: "dni", value: searchTerm }
+            ]);
         } else {
             setColumnFilters([]);
         }
@@ -322,13 +430,13 @@ export const useDepartmentTable = ({
         setPagination: handlePaginationChange,
         columns,
         tableVariants,
-        isEmpty: departments.length === 0,
+        isEmpty: employees.length === 0,
         dataVersion,
         searchTerm,
         onSearchChange,
         allSelected,
         setAllSelected,
         handleBulkDelete,
-        getSelectedDepartmentIds,
+        getSelectedEmployeeIds,
     };
 };

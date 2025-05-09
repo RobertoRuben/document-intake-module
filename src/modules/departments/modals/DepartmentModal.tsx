@@ -1,5 +1,5 @@
 import { DepartmentModalForm } from "./components/department-modal-form/DepartmentModalForm";
-import { DepartmentModel } from "../models/department.model";
+import { Department } from "../models/department.model";
 import { useEffect, useState } from "react";
 import { Dialog } from "@radix-ui/react-dialog";
 import { DialogContent } from "@/modules/core/components/ui/dialog";
@@ -7,9 +7,9 @@ import { DepartmentModalHeader } from "./components/department-modal-header/Depa
 
 interface DepartmentModalProps {
     isOpen: boolean;
-    department?: DepartmentModel;
+    department?: Department;
     onClose: () => void;
-    onSubmit: (data: DepartmentModel) => Promise<boolean>;
+    onSubmit: (data: Department) => Promise<boolean>;
 }
 
 export const DepartmentModal: React.FC<DepartmentModalProps> = ({
@@ -19,7 +19,7 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
     onSubmit
 }) => {
 
-    const [internalDepartment, setInternalDepartment] = useState<DepartmentModel | undefined>(department);
+    const [internalDepartment, setInternalDepartment] = useState<Department | undefined>(department);
     const isEditing = !!internalDepartment;
 
     useEffect(() => {

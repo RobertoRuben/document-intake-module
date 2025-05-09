@@ -15,9 +15,9 @@ import {
     OnChangeFn
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/modules/core/components/ui/table";
-import { useDepartmentTableContext } from "@/modules/departments/context/department-table.context";
-import { useDepartmentContext } from "@/modules/departments/context/department.context";
-import { Department } from "@/modules/departments/models/department.model";
+import { useEmployeeTableContext } from "../../context/employee-table.context";
+import { useEmployeeContext } from "../../context/employee.context";
+import { Employee } from "@/modules/employees/models/employee.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { DeleteModal } from "@/globals/modals/delete-modal/DeleteModal";
 import { toast } from "sonner";
@@ -28,7 +28,7 @@ import { BulkDeleteButton } from "@/globals/components/BulkDeleteButton";
 import { ExportToExcelButton } from "@/globals/components/ExportToExcelButton";
 import { EmptyStateMessage } from "@/globals/components/EmptyStateMessage";
 
-interface DepartmentTableContextType {
+interface EmployeeTableContextType {
     sorting: SortingState;
     setSorting: OnChangeFn<SortingState>;
     columnFilters: ColumnFiltersState;
@@ -40,18 +40,18 @@ interface DepartmentTableContextType {
     totalSelectedRows: number; 
     pagination: PaginationState;
     setPagination: OnChangeFn<PaginationState>;
-    columns: ColumnDef<Department, unknown>[];
+    columns: ColumnDef<Employee, unknown>[];
     tableVariants: Variants;
     dataVersion: number;
     searchTerm: string;
     onSearchChange: (value: string) => void;
     handleBulkDelete: () => Promise<void>;
-    getSelectedDepartmentIds?: () => number[];
-    departments: Department[];
+    getSelectedEmployeeIds?: () => number[];
+    employees: Employee[];
     paginationMeta: PaginationMetaModel;
 }
 
-export const DepartmentTable: React.FC = () => {
+export const EmployeeTable: React.FC = () => {
     const [localLoading, setLocalLoading] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     
@@ -73,41 +73,41 @@ export const DepartmentTable: React.FC = () => {
         searchTerm,
         onSearchChange,
         handleBulkDelete,
-        getSelectedDepartmentIds,
-        departments,
+        getSelectedEmployeeIds,
+        employees,
         paginationMeta
-    } = useDepartmentTableContext() as unknown as DepartmentTableContextType;
+    } = useEmployeeTableContext() as unknown as EmployeeTableContextType;
 
-    const { handleExportToExcel: exportToExcel, isLoading } = useDepartmentContext();
+    const { handleExportToExcel: exportToExcel, isLoading } = useEmployeeContext();
 
     const handleExportToExcel = async () => {
-        if (getSelectedDepartmentIds) {
-            const selectedIds = getSelectedDepartmentIds();
+        if (getSelectedEmployeeIds) {
+            const selectedIds = getSelectedEmployeeIds();
             if (selectedIds.length > 0) {
                 try {
                     await exportToExcel(selectedIds);
                 } catch (error) {
-                    console.error("Error al exportar los departamentos:", error);
+                    console.error("Error al exportar los empleados:", error);
                     toast.error("Error de exportación", {
-                        description: "No se pudieron exportar los departamentos seleccionados."
+                        description: "No se pudieron exportar los empleados seleccionados."
                     });
                 }
             } else {
                 toast.warning("Selección vacía", {
-                    description: "No hay departamentos seleccionados para exportar"
+                    description: "No hay empleados seleccionados para exportar"
                 });
             }
         }
     };
 
     const handleOpenBulkDeleteModal = () => {
-        if (getSelectedDepartmentIds) {
-            const selectedIds = getSelectedDepartmentIds();
+        if (getSelectedEmployeeIds) {
+            const selectedIds = getSelectedEmployeeIds();
             if (selectedIds.length > 0) {
                 setIsDeleteModalOpen(true);
             } else {
                 toast.warning("Selección vacía", {
-                    description: "No hay departamentos seleccionados para eliminar"
+                    description: "No hay empleados seleccionados para eliminar"
                 });
             }
         }
@@ -124,7 +124,7 @@ export const DepartmentTable: React.FC = () => {
     };
 
     const table = useReactTable({
-        data: departments || [],
+        data: employees || [],
         columns,
         state: {
             sorting,
@@ -159,7 +159,7 @@ export const DepartmentTable: React.FC = () => {
                     <SearchInput
                         value={searchTerm}
                         onChange={onSearchChange}
-                        placeholder="Buscar departamentos..."
+                        placeholder="Buscar empleados..."
                     />
                 </div>
                 
@@ -199,7 +199,7 @@ export const DepartmentTable: React.FC = () => {
                     <SearchInput
                         value={searchTerm}
                         onChange={onSearchChange}
-                        placeholder="Buscar departamentos..."
+                        placeholder="Buscar empleados..."
                     />
                 </div>
                 
@@ -264,12 +264,12 @@ export const DepartmentTable: React.FC = () => {
                                 ))}
                             </TableHeader>
                             <TableBody>
-                                {isLoading && departments.length === 0 ? (
+                                {isLoading && employees.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={columns.length} className="p-4 text-center">
                                             <div className="flex justify-center items-center">
                                                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
-                                                <span className="ml-2">Cargando departamentos...</span>
+                                                <span className="ml-2">Cargando empleados...</span>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -291,7 +291,7 @@ export const DepartmentTable: React.FC = () => {
                                     <TableRow>
                                         <TableCell colSpan={columns.length} className="h-24">
                                             <EmptyStateMessage 
-                                                message="No se encontraron departamentos"
+                                                message="No se encontraron empleados"
                                             />
                                         </TableCell>
                                     </TableRow>
@@ -316,7 +316,7 @@ export const DepartmentTable: React.FC = () => {
                         });
                     }
                 }}
-                itemName="departamento"
+                itemName="empleado"
             />
             
             {/* Modal de confirmación para eliminación masiva */}
@@ -324,9 +324,9 @@ export const DepartmentTable: React.FC = () => {
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleBulkDeleteWithLoading}
-                title="Eliminar departamentos seleccionados"
+                title="Eliminar empleados seleccionados"
                 description={`¿Estás seguro que deseas eliminar ${totalSelectedRows} ${
-                    totalSelectedRows === 1 ? "departamento" : "departamentos"
+                    totalSelectedRows === 1 ? "empleado" : "empleados"
                 } seleccionados? Esta acción no se puede deshacer.`}
                 confirmButtonText="Eliminar"
                 cancelButtonText="Cancelar"

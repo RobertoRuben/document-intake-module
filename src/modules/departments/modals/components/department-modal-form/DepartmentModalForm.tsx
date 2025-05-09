@@ -1,16 +1,16 @@
 import React from "react";
 import { Form } from "@/modules/core/components/ui/form";
-import { DepartmentModel } from "@/modules/departments/models/department.model";
+import { Department } from "@/modules/departments/models/department.model";
 import { DepartmentModalFooter } from "../department-modal-footer/DepartmentModalFooter";
 import { DepartmentFormFields } from "./DepartmentFormFields";
 import { useDepartmentForm } from "../../hooks/use-department.hook";
 import { DepartmentFormValues } from "@/modules/departments/modals/validators/department.validator.schema";
 
 interface DepartmentModalFormProps {
-    department?: DepartmentModel;
+    department?: Department;
     isEditing: boolean;
     onClose: () => void;
-    onSubmit: (data: DepartmentModel) => Promise<boolean>;
+    onSubmit: (data: Department) => Promise<boolean>;
 }
 
 export const DepartmentModalForm: React.FC<DepartmentModalFormProps> = ({
@@ -23,7 +23,7 @@ export const DepartmentModalForm: React.FC<DepartmentModalFormProps> = ({
     const { form } = useDepartmentForm(department);
 
     const handleSubmit = async (values: DepartmentFormValues) => {
-        const departmentData: DepartmentModel = {
+        const departmentData: Department = {
             id: department?.id || undefined,
             name: values.name,
         };

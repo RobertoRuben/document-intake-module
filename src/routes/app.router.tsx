@@ -5,6 +5,7 @@ import { ProtectedRoute } from "@/modules/auth/routes/protected-route.component.
 import { RoleRoutes} from "@/modules/roles/routes/role.router.tsx";
 import { DepartmentRoutes } from "@/modules/departments/routes/department.router.tsx";
 import { PositionRoutes } from "@/modules/positions/routes/position.router.tsx";
+import { EmployeeRoutes } from "@/modules/employees/routes/employee.router.tsx";
 
 export function AppRouter() {
     return (
@@ -16,6 +17,7 @@ export function AppRouter() {
                     {RoleRoutes}
                     {DepartmentRoutes}
                     {PositionRoutes}
+                    {EmployeeRoutes}
                 </Route>
             </Route>
 

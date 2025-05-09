@@ -1,12 +1,18 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { departmentService, DepartmentOperationError } from "../services/department.service";
+import { employeeService } from "../services/employee.service";
+import { positionService } from "@/modules/positions/service/position.service";
+import { departmentService } from "@/modules/departments/services/department.service"; 
+import { AppOperationError } from "@/globals/exceptions/api-error.handler";
+import { Employee } from "../models/employee.model";
+import { Position } from "@/modules/positions/model/position.model";
 import { Department } from "@/modules/departments/models/department.model";
-import { PaginatedDepartmentsResponseModel } from "@/modules/departments/models/department.page.model";
+import { PaginatedEmployeesResponseModel } from "../models/employe-page.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { toast } from "sonner";
 
-
-export const useDepartmentContainerHook = () => {
+export const useEmployeeContainerHook = () => {
+    const [employees, setEmployees] = useState<Employee[]>([]);
+    const [positions, setPositions] = useState<Position[]>([]);
     const [departments, setDepartments] = useState<Department[]>([]);
     const [paginationMeta, setPaginationMeta] = useState<PaginationMetaModel>({
         currentPage: 1,
@@ -21,11 +27,11 @@ export const useDepartmentContainerHook = () => {
     const [searchTerm, setSearchTerm] = useState("");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedDepartment, setSelectedDepartment] = useState<Department | undefined>(undefined);
+    const [selectedEmployee, setSelectedEmployee] = useState<Employee | undefined>(undefined);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [departmentToDelete, setDepartmentToDelete] = useState<Department | undefined>(undefined);
-    const [selectedDepartmentIds, setSelectedDepartmentIds] = useState<number[]>([]);
+    const [employeeToDelete, setEmployeeToDelete] = useState<Employee | undefined>(undefined);
+    const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<number[]>([]);
 
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -35,21 +41,21 @@ export const useDepartmentContainerHook = () => {
     const lastFetchParamsRef = useRef<{page: number, search: string} | null>(null);
     
     const pagesCache = useRef<Record<string, {
-        data: Department[],
+        data: Employee[],
         meta: PaginationMetaModel,
         timestamp: number
     }>>({});
     
     const CACHE_VALIDITY_TIME = 5 * 60 * 1000;
 
-    const fetchDepartments = useCallback(async (page = currentPage, search = searchTerm, forceRefresh = false) => {
+    const fetchEmployees = useCallback(async (page = currentPage, search = searchTerm, forceRefresh = false) => {
         const cacheKey = `${page}:${search}`;
         
         const cachedData = pagesCache.current[cacheKey];
         const now = Date.now();
         
         if (!forceRefresh && cachedData && (now - cachedData.timestamp < CACHE_VALIDITY_TIME)) {
-            setDepartments(cachedData.data);
+            setEmployees(cachedData.data);
             setPaginationMeta(cachedData.meta);
             setIsLoading(false);
             return;
@@ -64,17 +70,16 @@ export const useDepartmentContainerHook = () => {
         
         lastFetchParamsRef.current = fetchParams;
         
-        
         setIsLoading(true);
         setError(null);
         
         try {
-            let response: PaginatedDepartmentsResponseModel;
+            let response: PaginatedEmployeesResponseModel;
 
             if (search) {
-                response = await departmentService.searchDepartments(search, page);
+                response = await employeeService.searchEmployees(search, page);
             } else {
-                response = await departmentService.getPaginatedDepartments(page);
+                response = await employeeService.getPaginatedEmployees(page);
             }
 
             if (response && response.data) {
@@ -84,7 +89,7 @@ export const useDepartmentContainerHook = () => {
                     timestamp: now
                 };
                 
-                setDepartments(response.data);
+                setEmployees(response.data);
 
                 if (response.meta) {
                     setPaginationMeta(response.meta);
@@ -92,12 +97,12 @@ export const useDepartmentContainerHook = () => {
 
                 setDataVersion(prev => prev + 1);
             } else {
-                setDepartments([]);
+                setEmployees([]);
             }
         } catch (err) {
-            let errorMessage = "Error al cargar los departamentos";
+            let errorMessage = "Error al cargar los empleados";
             
-            if (err instanceof DepartmentOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -107,23 +112,48 @@ export const useDepartmentContainerHook = () => {
             toast.error("Error", {
                 description: errorMessage,
             });
-            setDepartments([]);
+            setEmployees([]);
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [currentPage, searchTerm]);
 
     const invalidateCache = useCallback(() => {
         pagesCache.current = {};
     }, []);
 
+    const fetchPositionsAndDepartments = useCallback(async () => {
+        try {
+            const [positionsData, departmentsData] = await Promise.all([
+                positionService.getAllPositions(),
+                departmentService.getAllDepartments()
+            ]);
+            
+            setPositions(positionsData);
+            setDepartments(departmentsData);
+        } catch (err) {
+            let errorMessage = "Error al cargar los datos de referencia";
+            
+            if (err instanceof AppOperationError) {
+                errorMessage = err.details || err.message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+            
+            console.error(errorMessage);
+            toast.error("Error", {
+                description: errorMessage,
+            });
+        }
+    }, []);
+
     useEffect(() => {
-        fetchDepartments(1, "");
+        fetchEmployees(1, "");
+        fetchPositionsAndDepartments();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
-        
         if (fetchTimeoutRef.current) {
             clearTimeout(fetchTimeoutRef.current);
         }
@@ -133,12 +163,12 @@ export const useDepartmentContainerHook = () => {
         const now = Date.now();
         
         if (cachedData && (now - cachedData.timestamp < CACHE_VALIDITY_TIME)) {
-            setDepartments(cachedData.data);
+            setEmployees(cachedData.data);
             setPaginationMeta(cachedData.meta);
         }
 
         fetchTimeoutRef.current = setTimeout(() => {
-            fetchDepartments(currentPage, searchTerm);
+            fetchEmployees(currentPage, searchTerm);
         }, 300);
 
         return () => {
@@ -146,53 +176,53 @@ export const useDepartmentContainerHook = () => {
                 clearTimeout(fetchTimeoutRef.current);
             }
         };
-    }, [currentPage, searchTerm, fetchDepartments]);
+    }, [currentPage, searchTerm, fetchEmployees]);
 
-    const handleAddDepartment = useCallback(() => {
-        setSelectedDepartment(undefined);
+    const handleAddEmployee = useCallback(() => {
+        setSelectedEmployee(undefined);
         setIsModalOpen(true);
     }, []);
 
-    const handleEditDepartment = useCallback((id?: number) => {
+    const handleEditEmployee = useCallback((id?: number) => {
         if (id) {
-            const department = departments.find(department => department.id === id);
-            setSelectedDepartment(department);
+            const employee = employees.find(employee => employee.id === id);
+            setSelectedEmployee(employee);
             setIsModalOpen(true);
         }
-    }, [departments]);
+    }, [employees]);
 
-    const handleDeleteDepartment = useCallback((id?: number) => {
+    const handleDeleteEmployee = useCallback((id?: number) => {
         if (id) {
-            const department = departments.find(department => department.id === id);
-            setDepartmentToDelete(department);
+            const employee = employees.find(employee => employee.id === id);
+            setEmployeeToDelete(employee);
             setIsDeleteModalOpen(true);
         }
-    }, [departments]);
+    }, [employees]);
 
     const handleConfirmDelete = useCallback(async () => {
-        if (departmentToDelete?.id) {
+        if (employeeToDelete?.id) {
             setIsLoading(true);
             
             try {
-                await departmentService.deleteDepartment(departmentToDelete.id);
-                toast.success("Departamento eliminado", {
-                    description: "El departamento ha sido eliminado correctamente"
+                await employeeService.deleteEmployee(employeeToDelete.id);
+                toast.success("Empleado eliminado", {
+                    description: "El empleado ha sido eliminado correctamente"
                 });
                 
                 invalidateCache();
                 
-                if (departments.length === 1 && currentPage > 1) {
+                if (employees.length === 1 && currentPage > 1) {
                     const previousPage = currentPage - 1;
                     setCurrentPage(previousPage);
-                    fetchDepartments(previousPage, searchTerm, true);
+                    fetchEmployees(previousPage, searchTerm, true);
                 } else {
-                    fetchDepartments(currentPage, searchTerm, true);
+                    fetchEmployees(currentPage, searchTerm, true);
                 }
                 setIsDeleteModalOpen(false);
             } catch (err) {
-                let errorMessage = "Error al eliminar el departamento";
+                let errorMessage = "Error al eliminar el empleado";
                 
-                if (err instanceof DepartmentOperationError) {
+                if (err instanceof AppOperationError) {
                     errorMessage = err.details || err.message;
                 } else if (err instanceof Error) {
                     errorMessage = err.message;
@@ -205,60 +235,60 @@ export const useDepartmentContainerHook = () => {
                 setIsLoading(false);
             }
         }
-    }, [departmentToDelete, currentPage, searchTerm, fetchDepartments, invalidateCache, departments.length]);
+    }, [employeeToDelete, currentPage, searchTerm, fetchEmployees, invalidateCache, employees.length]);
 
     const handleCancelDelete = useCallback(() => {
         setIsDeleteModalOpen(false);
-        setDepartmentToDelete(undefined);
+        setEmployeeToDelete(undefined);
     }, []);
 
     const handleCloseModal = useCallback(() => {
         setIsModalOpen(false);
-        setSelectedDepartment(undefined);
+        setSelectedEmployee(undefined);
     }, []);
 
-    const handleSubmitDepartment = useCallback(async (data: Department) => {
+    const handleSubmitEmployee = useCallback(async (data: Employee) => {
         setIsLoading(true);
         
         try {
             if (data.id) {
-                await departmentService.updateDepartment(data.id, data);
-                toast.success("Departamento actualizado", {
-                    description: "El departamento ha sido actualizado correctamente"
+                await employeeService.updateEmployee(data.id, data);
+                toast.success("Empleado actualizado", {
+                    description: "El empleado ha sido actualizado correctamente"
                 });
                 invalidateCache();
-                fetchDepartments(currentPage, searchTerm, true);
+                fetchEmployees(currentPage, searchTerm, true);
                 setIsModalOpen(false);
                 return true;
             } else {
-                await departmentService.createDepartment(data);
-                toast.success("Departamento creado", {
-                    description: "El departamento ha sido creado correctamente"
+                await employeeService.createEmployee(data);
+                toast.success("Empleado creado", {
+                    description: "El empleado ha sido creado correctamente"
                 });
                 
                 invalidateCache();
                 
-                if (departments.length >= paginationMeta.perPage) {
+                if (employees.length >= paginationMeta.perPage) {
                     const newTotalItems = paginationMeta.total + 1;
                     const newTotalPages = Math.ceil(newTotalItems / paginationMeta.perPage);
                     
                     if (newTotalPages > paginationMeta.totalPages) {
                         setCurrentPage(newTotalPages);
-                        fetchDepartments(newTotalPages, searchTerm, true);
+                        fetchEmployees(newTotalPages, searchTerm, true);
                     } else {
-                        fetchDepartments(currentPage, searchTerm, true);
+                        fetchEmployees(currentPage, searchTerm, true);
                     }
                 } else {
-                    fetchDepartments(currentPage, searchTerm, true);
+                    fetchEmployees(currentPage, searchTerm, true);
                 }
                 
                 setIsModalOpen(false);
                 return true;
             }
         } catch (err) {
-            let errorMessage = "Error al guardar el departamento";
+            let errorMessage = "Error al guardar el empleado";
             
-            if (err instanceof DepartmentOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -271,7 +301,7 @@ export const useDepartmentContainerHook = () => {
             setIsLoading(false);
             return false;
         }
-    }, [currentPage, searchTerm, fetchDepartments, invalidateCache, departments.length, paginationMeta]);
+    }, [currentPage, searchTerm, fetchEmployees, invalidateCache, employees.length, paginationMeta]);
 
     const handleSearchChange = useCallback((value: string) => {
         setSearchTerm(value);
@@ -284,7 +314,7 @@ export const useDepartmentContainerHook = () => {
         const now = Date.now();
         
         if (cachedData && (now - cachedData.timestamp < CACHE_VALIDITY_TIME)) {
-            setDepartments(cachedData.data);
+            setEmployees(cachedData.data);
             setPaginationMeta(prev => ({
                 ...prev,
                 currentPage: page
@@ -294,34 +324,34 @@ export const useDepartmentContainerHook = () => {
         setCurrentPage(page);
     }, [searchTerm]);
 
-    const handleDeleteMultipleDepartments = useCallback(async (ids: number[]) => {
+    const handleDeleteMultipleEmployees = useCallback(async (ids: number[]) => {
         if (ids.length === 0) return;
         
         setIsLoading(true);
         
         try {
-            const result = await departmentService.deleteMultipleDepartments(ids);
-            toast.success("Departamentos eliminados", {
-                description: result.message || "Los departamentos han sido eliminados correctamente"
+            const result = await employeeService.deleteMultipleEmployees(ids);
+            toast.success("Empleados eliminados", {
+                description: result.message || "Los empleados han sido eliminados correctamente"
             });
             
             invalidateCache();
             
-            const allItemsDeleted = ids.length >= departments.length;
+            const allItemsDeleted = ids.length >= employees.length;
             
             if (allItemsDeleted && currentPage > 1) {
                 const previousPage = currentPage - 1;
                 setCurrentPage(previousPage);
-                fetchDepartments(previousPage, searchTerm, true);
+                fetchEmployees(previousPage, searchTerm, true);
             } else {
-                fetchDepartments(currentPage, searchTerm, true);
+                fetchEmployees(currentPage, searchTerm, true);
             }
             
-            setSelectedDepartmentIds([]);
+            setSelectedEmployeeIds([]);
         } catch (err) {
-            let errorMessage = "Error al eliminar los departamentos";
+            let errorMessage = "Error al eliminar los empleados";
             
-            if (err instanceof DepartmentOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -334,7 +364,7 @@ export const useDepartmentContainerHook = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [currentPage, searchTerm, fetchDepartments, invalidateCache, departments.length]);
+    }, [currentPage, searchTerm, fetchEmployees, invalidateCache, employees.length]);
 
     const handleExportToExcel = useCallback(async (ids: number[]) => {
         if (ids.length === 0) return;
@@ -342,14 +372,14 @@ export const useDepartmentContainerHook = () => {
         setIsLoading(true);
         
         try {
-            const excelBlob = await departmentService.exportDepartmentsToExcel(ids);
+            const excelBlob = await employeeService.exportEmployeesToExcel(ids);
             
             const url = window.URL.createObjectURL(excelBlob);
             const link = document.createElement('a');
             link.href = url;
             
             const date = new Date();
-            const fileName = `departamentos_${date.getDate()}${date.getMonth() + 1}${date.getFullYear()}${date.getHours()}${date.getMinutes()}.xlsx`;
+            const fileName = `empleados_${date.getDate()}${date.getMonth() + 1}${date.getFullYear()}${date.getHours()}${date.getMinutes()}.xlsx`;
             
             link.setAttribute('download', fileName);
             document.body.appendChild(link);
@@ -357,12 +387,12 @@ export const useDepartmentContainerHook = () => {
             document.body.removeChild(link);
             
             toast.success("Exportación completada", {
-                description: "Los departamentos han sido exportados a Excel correctamente"
+                description: "Los empleados han sido exportados a Excel correctamente"
             });
         } catch (err) {
-            let errorMessage = "Error al exportar los departamentos";
+            let errorMessage = "Error al exportar los empleados";
             
-            if (err instanceof DepartmentOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -377,12 +407,13 @@ export const useDepartmentContainerHook = () => {
         }
     }, []);
 
-    const handleSelectDepartments = useCallback((ids: number[]) => {
-        setSelectedDepartmentIds(ids);
+    const handleSelectEmployees = useCallback((ids: number[]) => {
+        setSelectedEmployeeIds(ids);
     }, []);
 
     useEffect(() => {
         return () => {
+            // Cleanup if needed
         };
     }, [dataVersion]);
 
@@ -402,14 +433,14 @@ export const useDepartmentContainerHook = () => {
                             (async () => {
                                 try {
                                     if (searchTerm) {
-                                        const response = await departmentService.searchDepartments(searchTerm, page);
+                                        const response = await employeeService.searchEmployees(searchTerm, page);
                                         pagesCache.current[cacheKey] = {
                                             data: response.data,
                                             meta: response.meta,
                                             timestamp: Date.now()
                                         };
                                     } else {
-                                        const response = await departmentService.getPaginatedDepartments(page);
+                                        const response = await employeeService.getPaginatedEmployees(page);
                                         pagesCache.current[cacheKey] = {
                                             data: response.data,
                                             meta: response.meta,
@@ -417,7 +448,7 @@ export const useDepartmentContainerHook = () => {
                                         };
                                     }
                                 } catch (err) {
-                                    if (err instanceof DepartmentOperationError) {
+                                    if (err instanceof AppOperationError) {
                                         console.log(`Error en precarga: ${err.details || err.message}`);
                                     } else {
                                         console.log(`Error en precarga: `, err);
@@ -434,29 +465,31 @@ export const useDepartmentContainerHook = () => {
     }, [paginationMeta, searchTerm]);
 
     return {
+        employees,
+        positions,
         departments,
         paginationMeta,
         dataVersion,
         currentPage,
         searchTerm,
         isModalOpen,
-        selectedDepartment,
+        selectedEmployee,
         isDeleteModalOpen,
-        departmentToDelete,
-        selectedDepartmentIds,
+        employeeToDelete,
+        selectedEmployeeIds,
         isLoading,
         error,
-        handleAddDepartment,
-        handleEditDepartment,
-        handleDeleteDepartment,
+        handleAddEmployee,
+        handleEditEmployee,
+        handleDeleteEmployee,
         handleConfirmDelete,
         handleCancelDelete,
         handleCloseModal,
-        handleSubmitDepartment,
+        handleSubmitEmployee,
         handleSearchChange,
         handlePageChange,
-        handleDeleteMultipleDepartments,
+        handleDeleteMultipleEmployees,
         handleExportToExcel,
-        handleSelectDepartments,
+        handleSelectEmployees,
     };
 };
