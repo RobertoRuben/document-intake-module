@@ -69,6 +69,9 @@ export const ColumnVisibilityDropdown: React.FC<ColumnVisibilityDropdownProps> =
             paternalSurname: "Apellido Paterno",
             maternalSurname: "Apellido Materno",
             gender: "Género",
+            isActive: "Estado",
+            roleName: "Rol",
+            employeeName: "Empleado",
 
             //Departments
             department: "Departamento",
