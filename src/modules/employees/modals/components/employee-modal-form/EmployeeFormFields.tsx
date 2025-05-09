@@ -17,6 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/modules/core/components/ui/select";
+import { User, Briefcase } from "lucide-react";
 
 interface EmployeeFormFieldsProps {
     form: UseFormReturn<EmployeeFormValues>;
@@ -31,23 +32,27 @@ export const EmployeeFormFields: React.FC<EmployeeFormFieldsProps> = ({
 }) => {
     return (
         <div className="space-y-6">
-            <div>
-                <h3 className="text-lg font-medium mb-3 border-b pb-2">Información Personal</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 border rounded-lg shadow-sm bg-card">
+                <div className="flex items-center gap-2 mb-2">
+                    <User className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-medium">Información Personal</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                    Introduce la información personal e identificación del empleado.
+                </p>
+                <div className="space-y-4">
                     {/* DNI */}
                     <FormField
                         control={form.control}
                         name="dni"
                         render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="w-full">
                                 <FormLabel>DNI</FormLabel>
                                 <FormControl>
                                     <Input
-                                        type="number"
                                         placeholder="Ingrese el DNI"
                                         {...field}
                                         onChange={(e) => field.onChange(Number(e.target.value))}
-                                        className="w-full"
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -55,11 +60,66 @@ export const EmployeeFormFields: React.FC<EmployeeFormFieldsProps> = ({
                         )}
                     />
 
+                    {/* Nombres */}
+                    <FormField
+                        control={form.control}
+                        name="names"
+                        render={({ field }) => (
+                            <FormItem className="w-full">
+                                <FormLabel>Nombres</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="Ingrese los nombres"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Apellido Paterno */}
+                    <FormField
+                        control={form.control}
+                        name="paternalSurname"
+                        render={({ field }) => (
+                            <FormItem className="w-full">
+                                <FormLabel>Apellido Paterno</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="Ingrese el apellido paterno"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Apellido Materno */}
+                    <FormField
+                        control={form.control}
+                        name="maternalSurname"
+                        render={({ field }) => (
+                            <FormItem className="w-full">
+                                <FormLabel>Apellido Materno</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="Ingrese el apellido materno"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Género */}
                     <FormField
                         control={form.control}
                         name="gender"
                         render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="w-full">
                                 <FormLabel>Género</FormLabel>
                                 <Select 
                                     onValueChange={field.onChange} 
@@ -82,76 +142,21 @@ export const EmployeeFormFields: React.FC<EmployeeFormFieldsProps> = ({
                 </div>
             </div>
 
-            <div>
-                <h3 className="text-lg font-medium mb-3 border-b pb-2">Nombres y Apellidos</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Nombres */}
-                    <FormField
-                        control={form.control}
-                        name="names"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Nombres</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        placeholder="Ingrese los nombres"
-                                        {...field}
-                                        className="w-full"
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="paternalSurname"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Apellido Paterno</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        placeholder="Ingrese el apellido paterno"
-                                        {...field}
-                                        className="w-full"
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <div className="md:col-span-2">
-                        <FormField
-                            control={form.control}
-                            name="maternalSurname"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Apellido Materno</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Ingrese el apellido materno"
-                                            {...field}
-                                            className="w-full"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
+            <div className="p-4 border rounded-lg shadow-sm bg-card">
+                <div className="flex items-center gap-2 mb-2">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-medium">Información Laboral</h3>
                 </div>
-            </div>
-
-            <div>
-                <h3 className="text-lg font-medium mb-3 border-b pb-2">Información Laboral</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p className="text-sm text-muted-foreground mb-4">
+                    Selecciona la información relacionada con el puesto de trabajo.
+                </p>
+                <div className="space-y-4">
+                    {/* Cargo */}
                     <FormField
                         control={form.control}
                         name="positionId"
                         render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="w-full">
                                 <FormLabel>Cargo</FormLabel>
                                 <FormControl>
                                     <DropdownSearchable
@@ -162,7 +167,6 @@ export const EmployeeFormFields: React.FC<EmployeeFormFieldsProps> = ({
                                         filter="contains"
                                         value={positions.find(pos => pos.id === field.value)}
                                         onChange={(value) => field.onChange(value.id)}
-                                        className="w-full"
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -170,11 +174,12 @@ export const EmployeeFormFields: React.FC<EmployeeFormFieldsProps> = ({
                         )}
                     />
 
+                    {/* Departamento */}
                     <FormField
                         control={form.control}
                         name="departmentId"
                         render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="w-full">
                                 <FormLabel>Departamento</FormLabel>
                                 <FormControl>
                                     <DropdownSearchable
@@ -185,7 +190,6 @@ export const EmployeeFormFields: React.FC<EmployeeFormFieldsProps> = ({
                                         filter="contains"
                                         value={departments.find(dep => dep.id === field.value)}
                                         onChange={(value) => field.onChange(value.id)}
-                                        className="w-full"
                                     />
                                 </FormControl>
                                 <FormMessage />
