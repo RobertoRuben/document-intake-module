@@ -8,7 +8,7 @@ import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
  * Service for managing system roles
  */
 export class RoleService {
-  private readonly baseEndpoint = "/role";
+  private readonly baseEndpoint = "/roles";
 
   /**
    * Gets all roles

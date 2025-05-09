@@ -8,7 +8,7 @@ import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
  * Service for managing system positions
  */
 export class PositionService {
-  private readonly baseEndpoint = "/position";
+  private readonly baseEndpoint = "/positions";
 
   /**
    * Gets all positions
