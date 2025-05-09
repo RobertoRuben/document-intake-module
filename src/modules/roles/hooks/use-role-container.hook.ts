@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { roleService} from "@/modules/roles/service/role.service";
-import { RoleModel } from "@/modules/roles/models/role.model";
+import { Role } from "@/modules/roles/models/role.model";
 import { PaginatedRolesResponseModel } from "@/modules/roles/models/role.page.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { AppOperationError } from "@/globals/exceptions/api-error.handler";
@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 
 export const useRoleContainerHook = () => {
-    const [roles, setRoles] = useState<RoleModel[]>([]);
+    const [roles, setRoles] = useState<Role[]>([]);
     const [paginationMeta, setPaginationMeta] = useState<PaginationMetaModel>({
         currentPage: 1,
         perPage: 5,
@@ -22,10 +22,10 @@ export const useRoleContainerHook = () => {
     const [searchTerm, setSearchTerm] = useState("");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedRole, setSelectedRole] = useState<RoleModel | undefined>(undefined);
+    const [selectedRole, setSelectedRole] = useState<Role | undefined>(undefined);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [roleToDelete, setRoleToDelete] = useState<RoleModel | undefined>(undefined);
+    const [roleToDelete, setRoleToDelete] = useState<Role | undefined>(undefined);
     const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
 
     const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +36,7 @@ export const useRoleContainerHook = () => {
     const lastFetchParamsRef = useRef<{page: number, search: string} | null>(null);
     
     const pagesCache = useRef<Record<string, {
-        data: RoleModel[],
+        data: Role[],
         meta: PaginationMetaModel,
         timestamp: number
     }>>({});
@@ -218,7 +218,7 @@ export const useRoleContainerHook = () => {
         setSelectedRole(undefined);
     }, []);
 
-    const handleSubmitRole = useCallback(async (data: RoleModel) => {
+    const handleSubmitRole = useCallback(async (data: Role) => {
         setIsLoading(true);
         
         try {

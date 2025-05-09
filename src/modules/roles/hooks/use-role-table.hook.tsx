@@ -9,13 +9,13 @@ import {
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/modules/core/components/ui/button";
 import { Checkbox } from "@/modules/core/components/ui/checkbox";
-import { RoleModel } from "@/modules/roles/models/role.model";
+import { Role } from "@/modules/roles/models/role.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { TableActions } from "../components/role-table/TableActions";
 import { formatDateLima } from "@/globals/utils/dateUtils";
 
 interface UseRoleTableProps {
-    roles: RoleModel[];
+    roles: Role[];
     dataVersion: number;
     paginationMeta: PaginationMetaModel;
     searchTerm: string;
@@ -131,7 +131,7 @@ export const useRoleTable = ({
         setSelectedRoleIds(newSelectedRoleIds);
     };
 
-    const columns = useMemo<ColumnDef<RoleModel>[]>(
+    const columns = useMemo<ColumnDef<Role>[]>(
         () => [
             {
                 id: "select",
