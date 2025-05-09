@@ -83,11 +83,9 @@ export const UserTable: React.FC = () => {
     const handleExportToExcel = async () => {
         if (getSelectedUserIds) {
             const selectedIds = getSelectedUserIds();
-            if (selectedIds.length > 0) {
-                try {
+            if (selectedIds.length > 0) {                try {
                     await exportToExcel(selectedIds);
-                } catch (error) {
-                    console.error("Error al exportar los usuarios:", error);
+                } catch {
                     toast.error("Error de exportación", {
                         description: "No se pudieron exportar los usuarios seleccionados."
                     });
@@ -144,11 +142,11 @@ export const UserTable: React.FC = () => {
                 : updaterOrValue;
 
             setPagination(newPagination);
-        },
-        getCoreRowModel: getCoreRowModel(),
+        },        getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         manualPagination: true,
+        manualFiltering: true, // Deshabilitamos el filtrado automático porque ya viene del backend
         pageCount: paginationMeta?.totalPages || 0,
     });
 
