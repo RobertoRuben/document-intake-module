@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { roleService, RoleOperationError } from "@/modules/roles/service/role.service";
+import { roleService} from "@/modules/roles/service/role.service";
 import { RoleModel } from "@/modules/roles/models/role.model";
 import { PaginatedRolesResponseModel } from "@/modules/roles/models/role.page.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
+import { AppOperationError } from "@/globals/exceptions/api-error.handler";
 import { toast } from "sonner";
 
 
@@ -97,7 +98,7 @@ export const useRoleContainerHook = () => {
         } catch (err) {
             let errorMessage = "Error al cargar los roles";
             
-            if (err instanceof RoleOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -192,7 +193,7 @@ export const useRoleContainerHook = () => {
             } catch (err) {
                 let errorMessage = "Error al eliminar el rol";
                 
-                if (err instanceof RoleOperationError) {
+                if (err instanceof AppOperationError) {
                     errorMessage = err.details || err.message;
                 } else if (err instanceof Error) {
                     errorMessage = err.message;
@@ -258,7 +259,7 @@ export const useRoleContainerHook = () => {
         } catch (err) {
             let errorMessage = "Error al guardar el rol";
             
-            if (err instanceof RoleOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -321,7 +322,7 @@ export const useRoleContainerHook = () => {
         } catch (err) {
             let errorMessage = "Error al eliminar los roles";
             
-            if (err instanceof RoleOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -362,7 +363,7 @@ export const useRoleContainerHook = () => {
         } catch (err) {
             let errorMessage = "Error al exportar los roles";
             
-            if (err instanceof RoleOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -417,7 +418,7 @@ export const useRoleContainerHook = () => {
                                         };
                                     }
                                 } catch (err) {
-                                    if (err instanceof RoleOperationError) {
+                                    if (err instanceof AppOperationError) {
                                         console.log(`Error en precarga: ${err.details || err.message}`);
                                     } else {
                                         console.log(`Error en precarga: `, err);

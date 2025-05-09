@@ -1,61 +1,14 @@
-import axiosInstance from "../../../globals/config/axios-config";
+import axiosInstance from "@/globals/config/axios-config";
 import { camelizeKeys, decamelizeKeys } from "humps";
 import { RoleModel } from "@/modules/roles/models/role.model";
 import { PaginatedRolesResponseModel } from "@/modules/roles/models/role.page.model";
-import axios, { AxiosError } from "axios";
-
-export class RoleOperationError extends Error {
-  code: number;
-  details: string;
-
-  constructor(message: string, code: number = 500, details: string = "") {
-    super(message);
-    this.name = "RoleOperationError";
-    this.code = code;
-    this.details = details;
-  }
-}
+import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
 
 /**
  * Service for managing system roles
  */
 export class RoleService {
-  /**
-   * Procesa errores de la API y extrae los detalles
-   */
-  private handleApiError(error: unknown): never {
-    if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError;
-      interface ErrorResponse {
-        detail?: {
-          details?: string;
-          message?: string;
-          code?: number;
-        };
-      }
-      const responseData = axiosError.response?.data as ErrorResponse;
-
-      if (responseData?.detail) {
-        const errorDetail = responseData.detail;
-        const details =
-          errorDetail.details || errorDetail.message || "Error en la operación";
-        const code = errorDetail.code || axiosError.response?.status || 500;
-
-        throw new RoleOperationError(
-          errorDetail.message || "Error en la operación",
-          code,
-          details
-        );
-      }
-
-      throw new RoleOperationError(
-        "Error en la comunicación con el servidor",
-        axiosError.response?.status || 500
-      );
-    }
-
-    throw new RoleOperationError("Error inesperado en la operación");
-  }
+  private readonly baseEndpoint = "/role";
 
   /**
    * Gets all roles
@@ -63,10 +16,10 @@ export class RoleService {
    */
   async getAllRoles(): Promise<RoleModel[]> {
     try {
-      const response = await axiosInstance.get<unknown>("/role");
+      const response = await axiosInstance.get<unknown>(this.baseEndpoint);
       return camelizeKeys(response.data) as RoleModel[];
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }
   }
 
@@ -82,14 +35,14 @@ export class RoleService {
   ): Promise<PaginatedRolesResponseModel> {
     try {
       const response = await axiosInstance.get<unknown>(
-        `/role/paginated?page=${page}&size=${size}`
+        `${this.baseEndpoint}/paginated?page=${page}&size=${size}`
       );
       const paginatedResult = camelizeKeys(
         response.data
       ) as PaginatedRolesResponseModel;
       return paginatedResult;
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }
   }
 
@@ -107,11 +60,11 @@ export class RoleService {
   ): Promise<PaginatedRolesResponseModel> {
     try {
       const response = await axiosInstance.get<unknown>(
-        `/role/search?search_term=${searchTerm}&page=${page}&size=${size}`
+        `${this.baseEndpoint}/search?search_term=${searchTerm}&page=${page}&size=${size}`
       );
       return camelizeKeys(response.data) as PaginatedRolesResponseModel;
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }
   }
 
@@ -122,10 +75,10 @@ export class RoleService {
    */
   async getRoleById(id: number): Promise<RoleModel> {
     try {
-      const response = await axiosInstance.get<unknown>(`/role/${id}`);
+      const response = await axiosInstance.get<unknown>(`${this.baseEndpoint}/${id}`);
       return camelizeKeys(response.data) as RoleModel;
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }
   }
 
@@ -137,10 +90,10 @@ export class RoleService {
   async createRole(role: RoleModel): Promise<RoleModel> {
     try {
       const payload = decamelizeKeys(role);
-      const response = await axiosInstance.post<unknown>("/role", payload);
+      const response = await axiosInstance.post<unknown>(this.baseEndpoint, payload);
       return camelizeKeys(response.data) as RoleModel;
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }
   }
 
@@ -153,10 +106,10 @@ export class RoleService {
   async updateRole(id: number, role: RoleModel): Promise<RoleModel> {
     try {
       const payload = decamelizeKeys(role);
-      const response = await axiosInstance.put<unknown>(`/role/${id}`, payload);
+      const response = await axiosInstance.put<unknown>(`${this.baseEndpoint}/${id}`, payload);
       return camelizeKeys(response.data) as RoleModel;
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }
   }
 
@@ -167,30 +120,29 @@ export class RoleService {
    */
   async deleteRole(id: number): Promise<{ message: string }> {
     try {
-      const response = await axiosInstance.delete<unknown>(`/role/${id}`);
+      const response = await axiosInstance.delete<unknown>(`${this.baseEndpoint}/${id}`);
       return camelizeKeys(response.data) as { message: string };
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }
   }
 
-/**
- * Deletes multiple roles by their IDs
- * @param ids Array of role IDs to delete
- * @returns Confirmation message
- */
-async deleteMultipleRoles(ids: number[]): Promise<{ message: string }> {
-  try {
-    // Enviar el array de IDs directamente, sin envolverlo en un objeto
-    const response = await axiosInstance.post<unknown>(
-      "/role/delete-multiple",
-      ids
-    );
-    return camelizeKeys(response.data) as { message: string };
-  } catch (error) {
-    throw this.handleApiError(error);
+  /**
+   * Deletes multiple roles by their IDs
+   * @param ids Array of role IDs to delete
+   * @returns Confirmation message
+   */
+  async deleteMultipleRoles(ids: number[]): Promise<{ message: string }> {
+    try {
+      const response = await axiosInstance.post<unknown>(
+        `${this.baseEndpoint}/delete-multiple`,
+        ids
+      );
+      return camelizeKeys(response.data) as { message: string };
+    } catch (error) {
+      throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
+    }
   }
-}
 
   /**
    * Exports roles to Excel based on provided IDs
@@ -199,14 +151,18 @@ async deleteMultipleRoles(ids: number[]): Promise<{ message: string }> {
    */
   async exportRolesToExcel(ids: number[]): Promise<Blob> {
     try {
-      const response = await axiosInstance.post("/role/export-excel", ids, {
-        responseType: "blob",
-      });
+      const response = await axiosInstance.post(
+        `${this.baseEndpoint}/export-excel`, 
+        ids, 
+        {
+          responseType: "blob",
+        }
+      );
       return new Blob([response.data], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }
   }
 }

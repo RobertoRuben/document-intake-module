@@ -1,4 +1,4 @@
-import axiosInstance from "../../../globals/config/axios-config";
+import axiosInstance from "@/globals/config/axios-config";
 import { camelizeKeys, decamelizeKeys } from "humps";
 import { Position } from "@/modules/positions/model/position.model";
 import { PaginatedPositionsResponseModel } from "@/modules/positions/model/position.page.model";
@@ -8,13 +8,15 @@ import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
  * Service for managing system positions
  */
 export class PositionService {
+  private readonly baseEndpoint = "/position";
+
   /**
    * Gets all positions
    * @returns List of positions
    */
   async getAllPositions(): Promise<Position[]> {
     try {
-      const response = await axiosInstance.get<unknown>("/position");
+      const response = await axiosInstance.get<unknown>(this.baseEndpoint);
       return camelizeKeys(response.data) as Position[];
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "PositionOperationError");
@@ -33,7 +35,7 @@ export class PositionService {
   ): Promise<PaginatedPositionsResponseModel> {
     try {
       const response = await axiosInstance.get<unknown>(
-        `/position/paginated?page=${page}&size=${size}`
+        `${this.baseEndpoint}/paginated?page=${page}&size=${size}`
       );
       const paginatedResult = camelizeKeys(
         response.data
@@ -58,7 +60,7 @@ export class PositionService {
   ): Promise<PaginatedPositionsResponseModel> {
     try {
       const response = await axiosInstance.get<unknown>(
-        `/position/search?search_term=${searchTerm}&page=${page}&size=${size}`
+        `${this.baseEndpoint}/search?search_term=${searchTerm}&page=${page}&size=${size}`
       );
       return camelizeKeys(response.data) as PaginatedPositionsResponseModel;
     } catch (error) {
@@ -73,7 +75,7 @@ export class PositionService {
    */
   async getPositionById(id: number): Promise<Position> {
     try {
-      const response = await axiosInstance.get<unknown>(`/position/${id}`);
+      const response = await axiosInstance.get<unknown>(`${this.baseEndpoint}/${id}`);
       return camelizeKeys(response.data) as Position;
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "PositionOperationError");
@@ -88,7 +90,7 @@ export class PositionService {
   async createPosition(position: Position): Promise<Position> {
     try {
       const payload = decamelizeKeys(position);
-      const response = await axiosInstance.post<unknown>("/position", payload);
+      const response = await axiosInstance.post<unknown>(this.baseEndpoint, payload);
       return camelizeKeys(response.data) as Position;
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "PositionOperationError");
@@ -104,7 +106,7 @@ export class PositionService {
   async updatePosition(id: number, position: Position): Promise<Position> {
     try {
       const payload = decamelizeKeys(position);
-      const response = await axiosInstance.put<unknown>(`/position/${id}`, payload);
+      const response = await axiosInstance.put<unknown>(`${this.baseEndpoint}/${id}`, payload);
       return camelizeKeys(response.data) as Position;
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "PositionOperationError");
@@ -118,7 +120,7 @@ export class PositionService {
    */
   async deletePosition(id: number): Promise<{ message: string }> {
     try {
-      const response = await axiosInstance.delete<unknown>(`/position/${id}`);
+      const response = await axiosInstance.delete<unknown>(`${this.baseEndpoint}/${id}`);
       return camelizeKeys(response.data) as { message: string };
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "PositionOperationError");
@@ -133,7 +135,7 @@ export class PositionService {
   async deleteMultiplePositions(ids: number[]): Promise<{ message: string }> {
     try {
       const response = await axiosInstance.post<unknown>(
-        "/position/delete-multiple",
+        `${this.baseEndpoint}/delete-multiple`,
         ids
       );
       return camelizeKeys(response.data) as { message: string };
@@ -149,9 +151,13 @@ export class PositionService {
    */
   async exportPositionsToExcel(ids: number[]): Promise<Blob> {
     try {
-      const response = await axiosInstance.post("/position/export-excel", ids, {
-        responseType: "blob",
-      });
+      const response = await axiosInstance.post(
+        `${this.baseEndpoint}/export-excel`, 
+        ids, 
+        {
+          responseType: "blob",
+        }
+      );
       return new Blob([response.data], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });

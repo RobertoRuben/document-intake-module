@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { departmentService, DepartmentOperationError } from "../services/department.service";
+import { departmentService} from "../services/department.service";
+import { AppOperationError } from "@/globals/exceptions/api-error.handler";
 import { Department } from "@/modules/departments/models/department.model";
 import { PaginatedDepartmentsResponseModel } from "@/modules/departments/models/department.page.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
@@ -97,7 +98,7 @@ export const useDepartmentContainerHook = () => {
         } catch (err) {
             let errorMessage = "Error al cargar los departamentos";
             
-            if (err instanceof DepartmentOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -192,7 +193,7 @@ export const useDepartmentContainerHook = () => {
             } catch (err) {
                 let errorMessage = "Error al eliminar el departamento";
                 
-                if (err instanceof DepartmentOperationError) {
+                if (err instanceof AppOperationError) {
                     errorMessage = err.details || err.message;
                 } else if (err instanceof Error) {
                     errorMessage = err.message;
@@ -258,7 +259,7 @@ export const useDepartmentContainerHook = () => {
         } catch (err) {
             let errorMessage = "Error al guardar el departamento";
             
-            if (err instanceof DepartmentOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -321,7 +322,7 @@ export const useDepartmentContainerHook = () => {
         } catch (err) {
             let errorMessage = "Error al eliminar los departamentos";
             
-            if (err instanceof DepartmentOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -362,7 +363,7 @@ export const useDepartmentContainerHook = () => {
         } catch (err) {
             let errorMessage = "Error al exportar los departamentos";
             
-            if (err instanceof DepartmentOperationError) {
+            if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -417,7 +418,7 @@ export const useDepartmentContainerHook = () => {
                                         };
                                     }
                                 } catch (err) {
-                                    if (err instanceof DepartmentOperationError) {
+                                    if (err instanceof AppOperationError) {
                                         console.log(`Error en precarga: ${err.details || err.message}`);
                                     } else {
                                         console.log(`Error en precarga: `, err);

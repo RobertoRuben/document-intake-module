@@ -1,4 +1,4 @@
-import axiosInstance from "../../../globals/config/axios-config";
+import axiosInstance from "@/globals/config/axios-config";
 import { camelizeKeys, decamelizeKeys } from "humps";
 import { Employee } from "@/modules/employees/models/employee.model";
 import { PaginatedEmployeesResponseModel } from "@/modules/employees/models/employe-page.model";

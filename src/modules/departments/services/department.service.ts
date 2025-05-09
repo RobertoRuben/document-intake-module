@@ -1,61 +1,14 @@
-import axiosInstance from "../../../globals/config/axios-config";
+import axiosInstance from "@/globals/config/axios-config";
 import { camelizeKeys, decamelizeKeys } from "humps";
 import { Department } from "@/modules/departments/models/department.model";
 import { PaginatedDepartmentsResponseModel } from "@/modules/departments/models/department.page.model";
-import axios, { AxiosError } from "axios";
-
-export class DepartmentOperationError extends Error {
-  code: number;
-  details: string;
-
-  constructor(message: string, code: number = 500, details: string = "") {
-    super(message);
-    this.name = "DepartmentOperationError";
-    this.code = code;
-    this.details = details;
-  }
-}
+import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
 
 /**
  * Service for managing system departments
  */
 export class DepartmentService {
-  /**
-   * Processes API errors and throws a custom error
-   */
-  private handleApiError(error: unknown): never {
-    if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError;
-      interface ErrorResponse {
-        detail?: {
-          details?: string;
-          message?: string;
-          code?: number;
-        };
-      }
-      const responseData = axiosError.response?.data as ErrorResponse;
-
-      if (responseData?.detail) {
-        const errorDetail = responseData.detail;
-        const details =
-          errorDetail.details || errorDetail.message || "Error en la operación";
-        const code = errorDetail.code || axiosError.response?.status || 500;
-
-        throw new DepartmentOperationError(
-          errorDetail.message || "Error en la operación",
-          code,
-          details
-        );
-      }
-
-      throw new DepartmentOperationError(
-        "Error en la comunicación con el servidor",
-        axiosError.response?.status || 500
-      );
-    }
-
-    throw new DepartmentOperationError("Error inesperado en la operación");
-  }
+  private readonly baseEndpoint = "/department";
 
   /**
    * Gets all departments
@@ -63,10 +16,10 @@ export class DepartmentService {
    */
   async getAllDepartments(): Promise<Department[]> {
     try {
-      const response = await axiosInstance.get<unknown>("/department");
+      const response = await axiosInstance.get<unknown>(this.baseEndpoint);
       return camelizeKeys(response.data) as Department[];
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "DepartmentOperationError");
     }
   }
 
@@ -82,14 +35,14 @@ export class DepartmentService {
   ): Promise<PaginatedDepartmentsResponseModel> {
     try {
       const response = await axiosInstance.get<unknown>(
-        `/department/paginated?page=${page}&size=${size}`
+        `${this.baseEndpoint}/paginated?page=${page}&size=${size}`
       );
       const paginatedResult = camelizeKeys(
         response.data
       ) as PaginatedDepartmentsResponseModel;
       return paginatedResult;
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "DepartmentOperationError");
     }
   }
 
@@ -107,11 +60,11 @@ export class DepartmentService {
   ): Promise<PaginatedDepartmentsResponseModel> {
     try {
       const response = await axiosInstance.get<unknown>(
-        `/department/search?search_term=${searchTerm}&page=${page}&size=${size}`
+        `${this.baseEndpoint}/search?search_term=${searchTerm}&page=${page}&size=${size}`
       );
       return camelizeKeys(response.data) as PaginatedDepartmentsResponseModel;
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "DepartmentOperationError");
     }
   }
 
@@ -122,10 +75,10 @@ export class DepartmentService {
    */
   async getDepartmentById(id: number): Promise<Department> {
     try {
-      const response = await axiosInstance.get<unknown>(`/department/${id}`);
+      const response = await axiosInstance.get<unknown>(`${this.baseEndpoint}/${id}`);
       return camelizeKeys(response.data) as Department;
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "DepartmentOperationError");
     }
   }
 
@@ -140,12 +93,12 @@ export class DepartmentService {
     try {
       const payload = decamelizeKeys(department);
       const response = await axiosInstance.post<unknown>(
-        "/department",
+        this.baseEndpoint,
         payload
       );
       return camelizeKeys(response.data) as Department;
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "DepartmentOperationError");
     }
   }
 
@@ -162,12 +115,12 @@ export class DepartmentService {
     try {
       const payload = decamelizeKeys(department);
       const response = await axiosInstance.put<unknown>(
-        `/department/${id}`,
+        `${this.baseEndpoint}/${id}`,
         payload
       );
       return camelizeKeys(response.data) as Department;
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "DepartmentOperationError");
     }
   }
 
@@ -178,12 +131,13 @@ export class DepartmentService {
    */
   async deleteDepartment(id: number): Promise<{ message: string }> {
     try {
-      const response = await axiosInstance.delete<unknown>(`/department/${id}`);
+      const response = await axiosInstance.delete<unknown>(`${this.baseEndpoint}/${id}`);
       return camelizeKeys(response.data) as { message: string };
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "DepartmentOperationError");
     }
   }
+  
   /**
    * Deletes multiple departments by their IDs
    * @param ids Array of department IDs to delete
@@ -192,12 +146,12 @@ export class DepartmentService {
   async deleteMultipleDepartments(ids: number[]): Promise<{ message: string }> {
     try {
       const response = await axiosInstance.post<unknown>(
-        "/department/delete-multiple",
+        `${this.baseEndpoint}/delete-multiple`,
         ids
       );
       return camelizeKeys(response.data) as { message: string };
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "DepartmentOperationError");
     }
   }
 
@@ -209,7 +163,7 @@ export class DepartmentService {
   async exportDepartmentsToExcel(ids: number[]): Promise<Blob> {
     try {
       const response = await axiosInstance.post(
-        "/department/export-excel",
+        `${this.baseEndpoint}/export-excel`,
         ids,
         {
           responseType: "blob",
@@ -219,7 +173,7 @@ export class DepartmentService {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
     } catch (error) {
-      throw this.handleApiError(error);
+      throw ApiErrorHandler.handleApiError(error, "DepartmentOperationError");
     }
   }
 }
