@@ -22,20 +22,21 @@ export class UserService {
       throw ApiErrorHandler.handleApiError(error, "UserOperationError");
     }
   }
-
   /**
    * Gets paginated users
    * @param page Page number
    * @param size Items per page
+   * @param onlyActive If true, returns only active users; if false, returns only inactive users
    * @returns Paginated response with users
    */
   async getPaginatedUsers(
     page: number = 1,
-    size: number = 5
+    size: number = 5,
+    onlyActive: boolean = true
   ): Promise<PaginatedUsersResponseModel> {
     try {
       const response = await axiosInstance.get<unknown>(
-        `${this.baseEndpoint}/paginated?page=${page}&size=${size}`
+        `${this.baseEndpoint}/paginated?page=${page}&size=${size}&only_active=${onlyActive}`
       );
       const paginatedResult = camelizeKeys(
         response.data
