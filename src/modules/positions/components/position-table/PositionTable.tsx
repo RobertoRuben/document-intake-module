@@ -181,8 +181,7 @@ export const PositionTable: React.FC = () => {
                         </div>
                     </>
                 )}
-                
-                <div className="w-full">
+                  <div className="w-full">
                     <ColumnVisibilityDropdown
                         columns={table.getAllColumns().map((column) => ({
                             id: column.id,
@@ -190,6 +189,7 @@ export const PositionTable: React.FC = () => {
                             toggleVisibility: (value) => column.toggleVisibility(value),
                             getCanHide: () => column.getCanHide(),
                         }))}
+                        isMobileView={true}
                     />
                 </div>
             </div>
@@ -218,8 +218,7 @@ export const PositionTable: React.FC = () => {
                             />
                         </>
                     )}
-                    
-                    <div className="w-[200px]">
+                      <div className="w-[200px]">
                         <ColumnVisibilityDropdown
                             columns={table.getAllColumns().map((column) => ({
                                 id: column.id,
@@ -227,6 +226,7 @@ export const PositionTable: React.FC = () => {
                                 toggleVisibility: (value) => column.toggleVisibility(value),
                                 getCanHide: () => column.getCanHide(),
                             }))}
+                            isMobileView={false}
                         />
                     </div>
                 </div>
