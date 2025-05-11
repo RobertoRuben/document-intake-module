@@ -13,17 +13,20 @@ import { User, UserStatus } from "@/modules/users/models/user.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { formatDateLima } from "@/globals/utils/dateUtils";
 import { Badge } from "@/modules/core/components/ui/badge";
+import { UserStatus as FilterStatus } from "@/globals/components/UserStatusFilter";
 
 interface UseUserTableProps {
     users: User[];
     dataVersion: number;
     paginationMeta: PaginationMetaModel;
     searchTerm: string;
+    statusFilter: FilterStatus;
     onEdit: (id?: number) => void;
     onDelete: (id?: number) => void;
     onChangeStatus?: (id: number, status: UserStatus) => void;
     onBulkDelete?: (ids: number[]) => void;
     onSearchChange: (value: string) => void;
+    onStatusFilterChange: (status: FilterStatus) => void;
     onPageChange: (page: number) => void;
 }
 
@@ -32,11 +35,13 @@ export const useUserTable = ({
     dataVersion,
     paginationMeta,
     searchTerm,
+    statusFilter,
     onEdit,
     onDelete,
     onChangeStatus,
     onBulkDelete,
     onSearchChange,
+    onStatusFilterChange,
     onPageChange,
 }: UseUserTableProps) => {
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -66,6 +71,25 @@ export const useUserTable = ({
             actions: totalSelectedRows === 0
         }));
     }, [totalSelectedRows]);
+
+    // Usamos este efecto para sincronizar el filtro de estado con los filtros de columna
+    useEffect(() => {
+        if (statusFilter === 'all') {
+            setColumnFilters(filters => filters.filter(f => f.id !== 'isActive'));
+        } else if (statusFilter === 'active') {
+            setColumnFilters(filters => {
+                const newFilters = filters.filter(f => f.id !== 'isActive');
+                newFilters.push({ id: 'isActive', value: true });
+                return newFilters;
+            });
+        } else if (statusFilter === 'inactive') {
+            setColumnFilters(filters => {
+                const newFilters = filters.filter(f => f.id !== 'isActive');
+                newFilters.push({ id: 'isActive', value: false });
+                return newFilters;
+            });
+        }
+    }, [statusFilter]);
 
     const rowSelection = useMemo(() => {
         const selection: RowSelectionState = {};
@@ -415,9 +439,7 @@ export const useUserTable = ({
         initial: { opacity: 0, scale: 0.95 },
         animate: { opacity: 1, scale: 1 },
         exit: { opacity: 0, scale: 0.95 },
-    };
-
-    return {
+    };    return {
         sorting,
         setSorting,
         columnFilters,
@@ -434,7 +456,9 @@ export const useUserTable = ({
         isEmpty: users.length === 0,
         dataVersion,
         searchTerm,
+        statusFilter,
         onSearchChange,
+        onStatusFilterChange,
         allSelected,
         setAllSelected,
         handleBulkDelete,

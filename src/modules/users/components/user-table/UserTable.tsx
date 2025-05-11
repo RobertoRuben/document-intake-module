@@ -27,6 +27,7 @@ import { TablePagination } from "@/globals/components/TablePagination";
 import { BulkDeleteButton } from "@/globals/components/BulkDeleteButton";
 import { ExportToExcelButton } from "@/globals/components/ExportToExcelButton";
 import { EmptyStateMessage } from "@/globals/components/EmptyStateMessage";
+import { UserStatusFilter, UserStatus as FilterStatus } from "@/globals/components/UserStatusFilter";
 
 interface UserTableContextType {
     sorting: SortingState;
@@ -49,11 +50,14 @@ interface UserTableContextType {
     getSelectedUserIds?: () => number[];
     users: User[];
     paginationMeta: PaginationMetaModel;
+    statusFilter?: FilterStatus;
+    onStatusFilterChange?: (status: FilterStatus) => void;
 }
 
 export const UserTable: React.FC = () => {
     const [localLoading, setLocalLoading] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [userStatusFilter, setUserStatusFilter] = useState<FilterStatus>('active');
     
     const {
         sorting,
@@ -75,7 +79,8 @@ export const UserTable: React.FC = () => {
         handleBulkDelete,
         getSelectedUserIds,
         users,
-        paginationMeta
+        paginationMeta,
+        onStatusFilterChange
     } = useUserTableContext() as unknown as UserTableContextType;
 
     const { handleExportToExcel: exportToExcel, isLoading } = useUserContext();
@@ -121,6 +126,13 @@ export const UserTable: React.FC = () => {
         }
     };
 
+    const handleStatusFilterChange = (status: FilterStatus) => {
+        setUserStatusFilter(status);
+        if (onStatusFilterChange) {
+            onStatusFilterChange(status);
+        }
+    };
+
     const table = useReactTable({
         data: users || [],
         columns,
@@ -151,8 +163,7 @@ export const UserTable: React.FC = () => {
     });
 
     return (
-        <div className="w-full">
-            <div className="flex flex-col gap-4 py-4 md:hidden">
+        <div className="w-full">            <div className="flex flex-col gap-4 py-4 md:hidden">
                 <div className="w-full">
                     <SearchInput
                         value={searchTerm}
@@ -160,7 +171,16 @@ export const UserTable: React.FC = () => {
                         placeholder="Buscar usuarios..."
                     />
                 </div>
-                
+                  {!searchTerm && (
+                    <div className="w-full">
+                        <UserStatusFilter
+                            value={userStatusFilter}
+                            onChange={handleStatusFilterChange}
+                            isMobileView={true}
+                        />
+                    </div>
+                )}
+
                 {totalSelectedRows > 0 && (
                     <>
                         <div className="w-full">
@@ -190,16 +210,25 @@ export const UserTable: React.FC = () => {
                         }))}
                     />
                 </div>
-            </div>
-            
-            <div className="hidden md:flex md:items-center md:justify-between gap-4 py-4">
-                <div className="w-full md:w-1/2 lg:w-1/3">
+            </div>            <div className="hidden md:flex md:items-center md:justify-between gap-4 py-4">
+                <div className="w-full md:w-1/3 lg:w-1/4">
                     <SearchInput
                         value={searchTerm}
                         onChange={onSearchChange}
                         placeholder="Buscar usuarios..."
                     />
                 </div>
+                
+                <div className="flex-grow"></div>
+                
+                {!searchTerm && (
+                    <div className="w-auto md:w-52 mr-4">
+                        <UserStatusFilter
+                            value={userStatusFilter}
+                            onChange={handleStatusFilterChange}
+                        />
+                    </div>
+                )}
                 
                 <div className="flex items-center gap-2">
                     {totalSelectedRows > 0 && (

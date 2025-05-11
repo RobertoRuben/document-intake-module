@@ -9,6 +9,7 @@ import { Employee } from "@/modules/employees/models/employee.model";
 import { PaginatedUsersResponseModel } from "../models/user-page.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { toast } from "sonner";
+import { UserStatus as FilterStatus } from "@/globals/components/UserStatusFilter";
 
 export const useUserContainerHook = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -21,10 +22,10 @@ export const useUserContainerHook = () => {
     totalPages: 0,
     nextPage: null,
     previousPage: null,
-  });
-  const [dataVersion, setDataVersion] = useState(0);
+  });  const [dataVersion, setDataVersion] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<FilterStatus>("active");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
@@ -37,8 +38,7 @@ export const useUserContainerHook = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const lastFetchParamsRef = useRef<{ page: number; search: string } | null>(
+  const lastFetchParamsRef = useRef<{ page: number; search: string; status: FilterStatus } | null>(
     null
   );
 
@@ -54,10 +54,9 @@ export const useUserContainerHook = () => {
   >({});
 
   const CACHE_VALIDITY_TIME = 5 * 60 * 1000;
-
   const fetchUsers = useCallback(
-    async (page = currentPage, search = searchTerm, forceRefresh = false) => {
-      const cacheKey = `${page}:${search}`;
+    async (page = currentPage, search = searchTerm, status = statusFilter, forceRefresh = false) => {
+      const cacheKey = `${page}:${search}:${status}`;
 
       const cachedData = pagesCache.current[cacheKey];
       const now = Date.now();
@@ -73,12 +72,13 @@ export const useUserContainerHook = () => {
         return;
       }
 
-      const fetchParams = { page, search };
+      const fetchParams = { page, search, status };
       if (
         !forceRefresh &&
         lastFetchParamsRef.current &&
         lastFetchParamsRef.current.page === page &&
-        lastFetchParamsRef.current.search === search
+        lastFetchParamsRef.current.search === search &&
+        lastFetchParamsRef.current.status === status
       ) {
         return;
       }
@@ -90,11 +90,20 @@ export const useUserContainerHook = () => {
 
       try {
         let response: PaginatedUsersResponseModel;
+        // Determinar el valor de onlyActive según el filtro de estado
+        let onlyActive: boolean | undefined;
+        
+        if (status === 'active') {
+          onlyActive = true;
+        } else if (status === 'inactive') {
+          onlyActive = false;
+        }
+        // Si status es 'all', dejamos onlyActive como undefined
 
         if (search) {
           response = await userService.searchUsers(search, page);
         } else {
-          response = await userService.getPaginatedUsers(page);
+          response = await userService.getPaginatedUsers(page, 5, onlyActive);
         }
 
         if (response && response.data) {
@@ -132,7 +141,7 @@ export const useUserContainerHook = () => {
         setIsLoading(false);
       }
     },
-    [currentPage, searchTerm]
+    [currentPage, searchTerm, statusFilter, CACHE_VALIDITY_TIME]
   );
 
   const invalidateCache = useCallback(() => {
@@ -169,13 +178,12 @@ export const useUserContainerHook = () => {
     fetchRolesAndEmployees();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   useEffect(() => {
     if (fetchTimeoutRef.current) {
       clearTimeout(fetchTimeoutRef.current);
     }
 
-    const cacheKey = `${currentPage}:${searchTerm}`;
+    const cacheKey = `${currentPage}:${searchTerm}:${statusFilter}`;
     const cachedData = pagesCache.current[cacheKey];
     const now = Date.now();
 
@@ -185,7 +193,7 @@ export const useUserContainerHook = () => {
     }
 
     fetchTimeoutRef.current = setTimeout(() => {
-      fetchUsers(currentPage, searchTerm);
+      fetchUsers(currentPage, searchTerm, statusFilter);
     }, 300);
 
     return () => {
@@ -193,7 +201,7 @@ export const useUserContainerHook = () => {
         clearTimeout(fetchTimeoutRef.current);
       }
     };
-  }, [currentPage, searchTerm, fetchUsers]);
+  }, [currentPage, searchTerm, statusFilter, fetchUsers, CACHE_VALIDITY_TIME]);
 
   const handleAddUser = useCallback(() => {
     setSelectedUser(undefined);
@@ -221,7 +229,6 @@ export const useUserContainerHook = () => {
     },
     [users]
   );
-
   const handleConfirmDelete = useCallback(async () => {
     if (userToDelete?.id) {
       setIsLoading(true);
@@ -237,9 +244,9 @@ export const useUserContainerHook = () => {
         if (users.length === 1 && currentPage > 1) {
           const previousPage = currentPage - 1;
           setCurrentPage(previousPage);
-          fetchUsers(previousPage, searchTerm, true);
+          fetchUsers(previousPage, searchTerm, statusFilter, true);
         } else {
-          fetchUsers(currentPage, searchTerm, true);
+          fetchUsers(currentPage, searchTerm, statusFilter, true);
         }
         setIsDeleteModalOpen(false);
       } catch (err) {
@@ -262,6 +269,7 @@ export const useUserContainerHook = () => {
     userToDelete,
     currentPage,
     searchTerm,
+    statusFilter,
     fetchUsers,
     invalidateCache,
     users.length,
@@ -276,7 +284,6 @@ export const useUserContainerHook = () => {
     setIsModalOpen(false);
     setSelectedUser(undefined);
   }, []);
-
   const handleSubmitUser = useCallback(
     async (data: User) => {
       setIsLoading(true);
@@ -288,7 +295,7 @@ export const useUserContainerHook = () => {
             description: "El usuario ha sido actualizado correctamente",
           });
           invalidateCache();
-          fetchUsers(currentPage, searchTerm, true);
+          fetchUsers(currentPage, searchTerm, statusFilter, true);
           setIsModalOpen(false);
           return true;
         } else {
@@ -307,12 +314,12 @@ export const useUserContainerHook = () => {
 
             if (newTotalPages > paginationMeta.totalPages) {
               setCurrentPage(newTotalPages);
-              fetchUsers(newTotalPages, searchTerm, true);
+              fetchUsers(newTotalPages, searchTerm, statusFilter, true);
             } else {
-              fetchUsers(currentPage, searchTerm, true);
+              fetchUsers(currentPage, searchTerm, statusFilter, true);
             }
           } else {
-            fetchUsers(currentPage, searchTerm, true);
+            fetchUsers(currentPage, searchTerm, statusFilter, true);
           }
 
           setIsModalOpen(false);
@@ -338,13 +345,13 @@ export const useUserContainerHook = () => {
     [
       currentPage,
       searchTerm,
+      statusFilter,
       fetchUsers,
       invalidateCache,
       users.length,
       paginationMeta,
     ]
   );
-
   const handleChangeUserStatus = useCallback(
     async (id: number, status: UserStatus) => {
       if (!id) return;
@@ -362,7 +369,7 @@ export const useUserContainerHook = () => {
         });
 
         invalidateCache();
-        fetchUsers(currentPage, searchTerm, true);
+        fetchUsers(currentPage, searchTerm, statusFilter, true);
       } catch (err) {
         let errorMessage = "Error al cambiar el estado del usuario";
 
@@ -380,7 +387,7 @@ export const useUserContainerHook = () => {
         setIsLoading(false);
       }
     },
-    [currentPage, searchTerm, fetchUsers, invalidateCache]
+    [currentPage, searchTerm, statusFilter, fetchUsers, invalidateCache]
   );
 
   const handleUpdatePassword = useCallback(
@@ -419,16 +426,22 @@ export const useUserContainerHook = () => {
       }
     },
     []
-  );
-
-  const handleSearchChange = useCallback((value: string) => {
+  );  const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
+    // Si hay texto en la búsqueda, reiniciamos el filtro de estado a 'all'
+    if (value) {
+      setStatusFilter('all');
+    }
     setCurrentPage(1);
   }, []);
 
+  const handleStatusFilterChange = useCallback((value: FilterStatus) => {
+    setStatusFilter(value);
+    setCurrentPage(1);
+  }, []);
   const handlePageChange = useCallback(
     (page: number) => {
-      const cacheKey = `${page}:${searchTerm}`;
+      const cacheKey = `${page}:${searchTerm}:${statusFilter}`;
       const cachedData = pagesCache.current[cacheKey];
       const now = Date.now();
 
@@ -442,10 +455,8 @@ export const useUserContainerHook = () => {
 
       setCurrentPage(page);
     },
-    [searchTerm]
-  );
-
-  const handleDeleteMultipleUsers = useCallback(
+    [searchTerm, statusFilter, CACHE_VALIDITY_TIME]
+  );  const handleDeleteMultipleUsers = useCallback(
     async (ids: number[]) => {
       if (ids.length === 0) return;
 
@@ -465,9 +476,9 @@ export const useUserContainerHook = () => {
         if (allItemsDeleted && currentPage > 1) {
           const previousPage = currentPage - 1;
           setCurrentPage(previousPage);
-          fetchUsers(previousPage, searchTerm, true);
+          fetchUsers(previousPage, searchTerm, statusFilter, true);
         } else {
-          fetchUsers(currentPage, searchTerm, true);
+          fetchUsers(currentPage, searchTerm, statusFilter, true);
         }
 
         setSelectedUserIds([]);
@@ -488,7 +499,7 @@ export const useUserContainerHook = () => {
         setIsLoading(false);
       }
     },
-    [currentPage, searchTerm, fetchUsers, invalidateCache, users.length]
+    [currentPage, searchTerm, statusFilter, fetchUsers, invalidateCache, users.length]
   );
 
   const handleExportToExcel = useCallback(async (ids: number[]) => {
@@ -543,7 +554,6 @@ export const useUserContainerHook = () => {
       // Cleanup if needed
     };
   }, [dataVersion]);
-
   useEffect(() => {
     if (paginationMeta && paginationMeta.totalPages > 1) {
       const pagesToPreload: number[] = [];
@@ -555,10 +565,18 @@ export const useUserContainerHook = () => {
       if (pagesToPreload.length > 0) {
         const preloadTimer = setTimeout(() => {
           pagesToPreload.forEach((page) => {
-            const cacheKey = `${page}:${searchTerm}`;
+            const cacheKey = `${page}:${searchTerm}:${statusFilter}`;
             if (!pagesCache.current[cacheKey]) {
               (async () => {
                 try {
+                  let onlyActive: boolean | undefined;
+                  
+                  if (statusFilter === 'active') {
+                    onlyActive = true;
+                  } else if (statusFilter === 'inactive') {
+                    onlyActive = false;
+                  }
+                  
                   if (searchTerm) {
                     const response = await userService.searchUsers(
                       searchTerm,
@@ -570,7 +588,7 @@ export const useUserContainerHook = () => {
                       timestamp: Date.now(),
                     };
                   } else {
-                    const response = await userService.getPaginatedUsers(page);
+                    const response = await userService.getPaginatedUsers(page, 5, onlyActive);
                     pagesCache.current[cacheKey] = {
                       data: response.data,
                       meta: response.meta,
@@ -594,8 +612,7 @@ export const useUserContainerHook = () => {
         return () => clearTimeout(preloadTimer);
       }
     }
-  }, [paginationMeta, searchTerm]);
-
+  }, [paginationMeta, searchTerm, statusFilter]);
   return {
     users,
     roles,
@@ -604,6 +621,7 @@ export const useUserContainerHook = () => {
     dataVersion,
     currentPage,
     searchTerm,
+    statusFilter,
     isModalOpen,
     selectedUser,
     isDeleteModalOpen,
@@ -621,6 +639,7 @@ export const useUserContainerHook = () => {
     handleChangeUserStatus,
     handleUpdatePassword,
     handleSearchChange,
+    handleStatusFilterChange,
     handlePageChange,
     handleDeleteMultipleUsers,
     handleExportToExcel,
