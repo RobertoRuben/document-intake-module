@@ -19,7 +19,6 @@ interface ColumnDefinition {
 interface ColumnVisibilityDropdownProps {
   columns: ColumnDefinition[];
   buttonText?: string;
-  buttonClassName?: string;
   columnLabels?: Record<string, string>;
   isMobileView?: boolean;
 }
@@ -29,7 +28,6 @@ export const ColumnVisibilityDropdown: React.FC<
 > = ({
   columns,
   buttonText = "Columnas",
-  buttonClassName = "w-full justify-between",
   columnLabels = {},
   isMobileView = false,
 }) => {
@@ -119,23 +117,27 @@ export const ColumnVisibilityDropdown: React.FC<
       .trim();
 
     return readableLabel;
-  };
-  return (
+  };  return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className={buttonClassName}>
+        <Button
+          variant="outline"
+          className={`w-full font-medium ${
+            isMobileView ? "justify-center" : "justify-between"
+          }`}
+        >
           <div
             className={`flex items-center gap-2 ${
-              isMobileView ? "justify-center w-full" : ""
+              isMobileView ? "justify-center" : ""
             }`}
           >
             <Columns className="h-4 w-4" />
             <span className="font-semibold">{buttonText}</span>
           </div>
-          <ChevronDown className="ml-2 h-4 w-4" />
+          {!isMobileView && <ChevronDown className="ml-2 h-4 w-4" />}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-[200px]">
         {columns
           .filter((column) => column.getCanHide())
           .map((column) => (
