@@ -17,7 +17,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/modules/core/components/ui/table";
 import { useSettlementTableContext } from "../../context/settlement-table.context";
 import { useSettlementContext } from "../../context/settlement.context";
-import { Settlement } from "@/modules/settlement/model/settlement.model";
+import { Settlement } from "@/modules/settlements/model/settlement.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { DeleteModal } from "@/globals/modals/delete-modal/DeleteModal";
 import { toast } from "sonner";

@@ -1,6 +1,6 @@
 import React from "react";
 import { Form } from "@/modules/core/components/ui/form";
-import { Settlement } from "@/modules/settlement/model/settlement.model";
+import { Settlement } from "@/modules/settlements/model/settlement.model";
 import { SettlementModalFooter } from "../settlement-modal-footer/SettlementModalFooter";
 import { SettlementFormFields } from "./SettlementFormFields";
 import { useSettlementForm } from "../../hooks/use-settlement.hook";

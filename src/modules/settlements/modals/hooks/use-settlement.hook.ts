@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Settlement } from "../../model/settlement.model";
-import { settlementFormSchema, SettlementFormValues } from "@/modules/settlement/modals/validators/settlement.validator.schema";
+import { settlementFormSchema, SettlementFormValues } from "@/modules/settlements/modals/validators/settlement.validator.schema";
 
 export const useSettlementForm = (settlement?: Settlement) => {
     const form = useForm<SettlementFormValues>({

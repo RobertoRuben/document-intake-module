@@ -9,7 +9,7 @@ import {
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/modules/core/components/ui/button";
 import { Checkbox } from "@/modules/core/components/ui/checkbox";
-import { Settlement } from "@/modules/settlement/model/settlement.model";
+import { Settlement } from "@/modules/settlements/model/settlement.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { formatDateLima } from "@/globals/utils/dateUtils";
 

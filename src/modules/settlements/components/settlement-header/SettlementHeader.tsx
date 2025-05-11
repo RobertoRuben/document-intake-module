@@ -1,5 +1,5 @@
 import React from "react";
-import { SettlementHeaderTitle } from "@/modules/settlement/components/settlement-header/SettlementHeaderTitle";
+import { SettlementHeaderTitle } from "@/modules/settlements/components/settlement-header/SettlementHeaderTitle";
 import { AddButton } from "@/globals/components/AddButton";
 
 interface SettlementHeaderProps {

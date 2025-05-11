@@ -1,7 +1,7 @@
 import axiosInstance from "@/globals/config/axios-config";
 import { camelizeKeys, decamelizeKeys } from "humps";
-import { Settlement } from "@/modules/settlement/model/settlement.model";
-import { PaginatedSettlementsResponseModel } from "@/modules/settlement/model/settlement-page.model";
+import { Settlement } from "@/modules/settlements/model/settlement.model";
+import { PaginatedSettlementsResponseModel } from "@/modules/settlements/model/settlement-page.model";
 import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
 
 /**

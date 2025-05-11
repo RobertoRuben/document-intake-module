@@ -1,10 +1,10 @@
 import React from "react";
-import { SettlementHeader } from "@/modules/settlement/components/settlement-header/SettlementHeader";
+import { SettlementHeader } from "@/modules/settlements/components/settlement-header/SettlementHeader";
 import { SettlementTable } from "../settlement-table/SettlementTable";
-import { SettlementTableProvider } from "@/modules/settlement/context/settlement-table.context";
-import { useSettlementContext } from "@/modules/settlement/context/settlement.context";
+import { SettlementTableProvider } from "@/modules/settlements/context/settlement-table.context";
+import { useSettlementContext } from "@/modules/settlements/context/settlement.context";
 import { DeleteModal } from "@/globals/modals/delete-modal/DeleteModal";
-import { SettlementModal } from "@/modules/settlement/modals/SettlementModal";
+import { SettlementModal } from "@/modules/settlements/modals/SettlementModal";
 import { Loader2 } from "lucide-react";
 
 export const SettlementContainer: React.FC = () => {
