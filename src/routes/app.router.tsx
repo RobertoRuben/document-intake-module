@@ -6,6 +6,7 @@ import { RoleRoutes} from "@/modules/roles/routes/role.router.tsx";
 import { DepartmentRoutes } from "@/modules/departments/routes/department.router.tsx";
 import { PositionRoutes } from "@/modules/positions/routes/position.router.tsx";
 import { EmployeeRoutes } from "@/modules/employees/routes/employee.router.tsx";
+import { UserRoutes } from "@/modules/users/routes/user.router.tsx";
 
 export function AppRouter() {
     return (
@@ -18,6 +19,7 @@ export function AppRouter() {
                     {DepartmentRoutes}
                     {PositionRoutes}
                     {EmployeeRoutes}
+                    {UserRoutes}
                 </Route>
             </Route>
 

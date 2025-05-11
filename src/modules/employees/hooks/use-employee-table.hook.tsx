@@ -91,17 +91,13 @@ export const useEmployeeTable = ({
                 .filter(id => selectedEmployeeIds[Number(id)])
                 .map(id => Number(id));
         }
-    };
-
-    const handleBulkDelete = () => {
+    };    const handleBulkDelete = () => {
         const selectedIds = getSelectedEmployeeIds();
         if (onBulkDelete && selectedIds.length > 0) {
             onBulkDelete(selectedIds);
             setAllSelected(false);
             setSelectedEmployeeIds({});
             setTotalSelectedRows(0);
-        } else {
-            console.warn("Función onBulkDelete no proporcionada o no hay empleados seleccionados");
         }
     };
 
@@ -378,22 +374,10 @@ export const useEmployeeTable = ({
             },
         ],
         [onEdit, onDelete, allSelected, paginationMeta?.total, selectedEmployeeIds]
-    );
-
-    useEffect(() => {
-        if (searchTerm) {
-            setColumnFilters([
-                { id: "names", value: searchTerm },
-                { id: "paternalSurname", value: searchTerm },
-                { id: "maternalSurname", value: searchTerm },
-                { id: "dni", value: searchTerm }
-            ]);
-        } else {
-            setColumnFilters([]);
-        }
-    }, [searchTerm]);
-
-    useEffect(() => {
+    );    useEffect(() => {
+        // No aplicamos filtros cuando usamos paginación manual
+        // Los datos ya vienen filtrados desde el backend
+    }, [searchTerm]);useEffect(() => {
         const backendPageIndex = (paginationMeta?.currentPage || 1) - 1;
         if (pagination.pageIndex !== backendPageIndex) {
             setPagination(prev => ({
@@ -401,7 +385,7 @@ export const useEmployeeTable = ({
                 pageIndex: backendPageIndex
             }));
         }
-    }, [paginationMeta?.currentPage]);
+    }, [paginationMeta?.currentPage, pagination.pageIndex]);
 
     const handlePaginationChange = (updatedPagination: typeof pagination) => {
         setPagination(updatedPagination);

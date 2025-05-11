@@ -20,8 +20,7 @@ interface EmployeeTableContextType {
 
 const EmployeeTableContext = createContext<EmployeeTableContextType | undefined>(undefined);
 
-export const EmployeeTableProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const {
+export const EmployeeTableProvider: React.FC<{ children: ReactNode }> = ({ children }) => {    const {
         employees,
         paginationMeta,
         dataVersion,

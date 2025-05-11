@@ -1,6 +1,6 @@
 import axiosInstance from "@/globals/config/axios-config";
 import { camelizeKeys, decamelizeKeys } from "humps";
-import { RoleModel } from "@/modules/roles/models/role.model";
+import { Role } from "@/modules/roles/models/role.model";
 import { PaginatedRolesResponseModel } from "@/modules/roles/models/role.page.model";
 import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
 
@@ -8,16 +8,16 @@ import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
  * Service for managing system roles
  */
 export class RoleService {
-  private readonly baseEndpoint = "/role";
+  private readonly baseEndpoint = "/roles";
 
   /**
    * Gets all roles
    * @returns List of roles
    */
-  async getAllRoles(): Promise<RoleModel[]> {
+  async getAllRoles(): Promise<Role[]> {
     try {
       const response = await axiosInstance.get<unknown>(this.baseEndpoint);
-      return camelizeKeys(response.data) as RoleModel[];
+      return camelizeKeys(response.data) as Role[];
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }
@@ -73,10 +73,10 @@ export class RoleService {
    * @param id Role ID
    * @returns Role data
    */
-  async getRoleById(id: number): Promise<RoleModel> {
+  async getRoleById(id: number): Promise<Role> {
     try {
       const response = await axiosInstance.get<unknown>(`${this.baseEndpoint}/${id}`);
-      return camelizeKeys(response.data) as RoleModel;
+      return camelizeKeys(response.data) as Role;
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }
@@ -87,11 +87,11 @@ export class RoleService {
    * @param role Role data to create
    * @returns Created role
    */
-  async createRole(role: RoleModel): Promise<RoleModel> {
+  async createRole(role: Role): Promise<Role> {
     try {
       const payload = decamelizeKeys(role);
       const response = await axiosInstance.post<unknown>(this.baseEndpoint, payload);
-      return camelizeKeys(response.data) as RoleModel;
+      return camelizeKeys(response.data) as Role;
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }
@@ -103,11 +103,11 @@ export class RoleService {
    * @param role New role data
    * @returns Updated role
    */
-  async updateRole(id: number, role: RoleModel): Promise<RoleModel> {
+  async updateRole(id: number, role: Role): Promise<Role> {
     try {
       const payload = decamelizeKeys(role);
       const response = await axiosInstance.put<unknown>(`${this.baseEndpoint}/${id}`, payload);
-      return camelizeKeys(response.data) as RoleModel;
+      return camelizeKeys(response.data) as Role;
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "RoleOperationError");
     }

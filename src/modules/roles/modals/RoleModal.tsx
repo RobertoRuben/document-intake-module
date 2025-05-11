@@ -5,13 +5,13 @@ import {
 } from "@/modules/core/components/ui/dialog";
 import { RoleModalHeader } from "./components/role-modal-header/RoleModalHeader";
 import { RoleModalForm } from "./components/role-modal-form/RoleModalForm";
-import { RoleModel } from "@/modules/roles/models/role.model";
+import { Role } from "@/modules/roles/models/role.model";
 
 interface RoleModalProps {
     isOpen: boolean;
-    role?: RoleModel;
+    role?: Role;
     onClose: () => void;
-    onSubmit: (data: RoleModel) => Promise<boolean>;
+    onSubmit: (data: Role) => Promise<boolean>;
 }
 
 export const RoleModal: React.FC<RoleModalProps> = ({
@@ -21,7 +21,7 @@ export const RoleModal: React.FC<RoleModalProps> = ({
                                                         onSubmit
                                                     }) => {
     // Mantener una copia interna del estado de edición
-    const [internalRole, setInternalRole] = useState<RoleModel | undefined>(role);
+    const [internalRole, setInternalRole] = useState<Role | undefined>(role);
     const isEditing = !!internalRole;
 
     useEffect(() => {

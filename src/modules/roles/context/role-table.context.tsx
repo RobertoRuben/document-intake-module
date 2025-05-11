@@ -1,11 +1,11 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { useRoleTable } from "../hooks/use-role-table.hook";
 import { useRoleContext } from "./role.context";
-import { RoleModel } from "../models/role.model";
+import { Role } from "../models/role.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model.ts";
 
 interface RoleTableContextType {
-    roles: RoleModel[];
+    roles: Role[];
     paginationMeta: PaginationMetaModel;
     dataVersion: number;
     currentPage: number;

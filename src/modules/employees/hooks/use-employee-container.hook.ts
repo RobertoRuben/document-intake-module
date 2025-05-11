@@ -46,9 +46,7 @@ export const useEmployeeContainerHook = () => {
         timestamp: number
     }>>({});
     
-    const CACHE_VALIDITY_TIME = 5 * 60 * 1000;
-
-    const fetchEmployees = useCallback(async (page = currentPage, search = searchTerm, forceRefresh = false) => {
+    const CACHE_VALIDITY_TIME = 5 * 60 * 1000;    const fetchEmployees = useCallback(async (page = currentPage, search = searchTerm, forceRefresh = false) => {
         const cacheKey = `${page}:${search}`;
         
         const cachedData = pagesCache.current[cacheKey];
@@ -116,7 +114,7 @@ export const useEmployeeContainerHook = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [currentPage, searchTerm]);
+    }, [currentPage, searchTerm, CACHE_VALIDITY_TIME]);
 
     const invalidateCache = useCallback(() => {
         pagesCache.current = {};
@@ -133,27 +131,21 @@ export const useEmployeeContainerHook = () => {
             setDepartments(departmentsData);
         } catch (err) {
             let errorMessage = "Error al cargar los datos de referencia";
-            
-            if (err instanceof AppOperationError) {
+              if (err instanceof AppOperationError) {
                 errorMessage = err.details || err.message;
             } else if (err instanceof Error) {
                 errorMessage = err.message;
             }
             
-            console.error(errorMessage);
             toast.error("Error", {
                 description: errorMessage,
             });
         }
-    }, []);
-
-    useEffect(() => {
+    }, []);    useEffect(() => {
         fetchEmployees(1, "");
         fetchPositionsAndDepartments();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
+    }, []);    useEffect(() => {
         if (fetchTimeoutRef.current) {
             clearTimeout(fetchTimeoutRef.current);
         }
@@ -176,7 +168,7 @@ export const useEmployeeContainerHook = () => {
                 clearTimeout(fetchTimeoutRef.current);
             }
         };
-    }, [currentPage, searchTerm, fetchEmployees]);
+    }, [currentPage, searchTerm, fetchEmployees, CACHE_VALIDITY_TIME]);
 
     const handleAddEmployee = useCallback(() => {
         setSelectedEmployee(undefined);
@@ -301,14 +293,10 @@ export const useEmployeeContainerHook = () => {
             setIsLoading(false);
             return false;
         }
-    }, [currentPage, searchTerm, fetchEmployees, invalidateCache, employees.length, paginationMeta]);
-
-    const handleSearchChange = useCallback((value: string) => {
+    }, [currentPage, searchTerm, fetchEmployees, invalidateCache, employees.length, paginationMeta]);    const handleSearchChange = useCallback((value: string) => {
         setSearchTerm(value);
         setCurrentPage(1); 
-    }, []);
-
-    const handlePageChange = useCallback((page: number) => {
+    }, []);    const handlePageChange = useCallback((page: number) => {
         const cacheKey = `${page}:${searchTerm}`;
         const cachedData = pagesCache.current[cacheKey];
         const now = Date.now();
@@ -322,7 +310,7 @@ export const useEmployeeContainerHook = () => {
         }
         
         setCurrentPage(page);
-    }, [searchTerm]);
+    }, [searchTerm, CACHE_VALIDITY_TIME]);
 
     const handleDeleteMultipleEmployees = useCallback(async (ids: number[]) => {
         if (ids.length === 0) return;
@@ -379,7 +367,7 @@ export const useEmployeeContainerHook = () => {
             link.href = url;
             
             const date = new Date();
-            const fileName = `empleados_${date.getDate()}${date.getMonth() + 1}${date.getFullYear()}${date.getHours()}${date.getMinutes()}.xlsx`;
+            const fileName = `${date.getDate()}${date.getMonth() + 1}${date.getFullYear()}${date.getHours()}${date.getMinutes()}.xlsx`;
             
             link.setAttribute('download', fileName);
             document.body.appendChild(link);
@@ -415,9 +403,7 @@ export const useEmployeeContainerHook = () => {
         return () => {
             // Cleanup if needed
         };
-    }, [dataVersion]);
-
-    useEffect(() => {
+    }, [dataVersion]);    useEffect(() => {
         if (paginationMeta && paginationMeta.totalPages > 1) {
             const pagesToPreload: number[] = [];
         
@@ -446,21 +432,17 @@ export const useEmployeeContainerHook = () => {
                                             meta: response.meta,
                                             timestamp: Date.now()
                                         };
-                                    }
-                                } catch (err) {
-                                    if (err instanceof AppOperationError) {
-                                        console.log(`Error en precarga: ${err.details || err.message}`);
-                                    } else {
-                                        console.log(`Error en precarga: `, err);
-                                    }
+                                    }                                } catch {
+                                    // Error silencioso - no interrumpe la experiencia del usuario
                                 }
                             })();
                         }
                     });
                 }, 1000); 
                 
-                return () => clearTimeout(preloadTimer);
-            }
+                return () => {
+                    clearTimeout(preloadTimer);
+                };            }
         }
     }, [paginationMeta, searchTerm]);
 

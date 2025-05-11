@@ -1,16 +1,16 @@
 import React from "react";
 import { Form } from "@/modules/core/components/ui/form";
-import { RoleModel } from "@/modules/roles/models/role.model";
+import { Role } from "@/modules/roles/models/role.model";
 import { RoleModalFooter } from "../role-modal-footer/RoleModalFooter";
 import { RoleFormFields } from "./RoleFormFields";
 import { useRoleForm} from "@/modules/roles/modals/hooks/use-role.hook";
 import { RoleFormValues} from "@/modules/roles/modals/validators/role.validator.schema.ts";
 
 interface RoleModalFormProps {
-    role?: RoleModel;
+    role?: Role;
     isEditing: boolean;
     onClose: () => void;
-    onSubmit: (data: RoleModel) => Promise<boolean>; 
+    onSubmit: (data: Role) => Promise<boolean>; 
 }
 
 export const RoleModalForm: React.FC<RoleModalFormProps> = ({
@@ -22,7 +22,7 @@ export const RoleModalForm: React.FC<RoleModalFormProps> = ({
     const { form } = useRoleForm(role);
 
     const handleSubmit = async (values: RoleFormValues) => {
-        const roleData: RoleModel = {
+        const roleData: Role = {
             id: role?.id || undefined,
             name: values.name,
         };

@@ -23,7 +23,7 @@ import { BulkDeleteButton } from "@/globals/components/BulkDeleteButton";
 import { ExportToExcelButton } from "@/globals/components/ExportToExcelButton";
 import { useRoleTableContext } from "@/modules/roles/context/role-table.context";
 import { useRoleContext } from "@/modules/roles/context/role.context";
-import { RoleModel } from "@/modules/roles/models/role.model";
+import { Role } from "@/modules/roles/models/role.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { DeleteModal } from "@/globals/modals/delete-modal/DeleteModal";
 import { toast } from "sonner";
@@ -40,7 +40,7 @@ interface RoleTableContextType {
     totalSelectedRows: number; 
     pagination: PaginationState;
     setPagination: OnChangeFn<PaginationState>;
-    columns: ColumnDef<RoleModel, unknown>[];
+    columns: ColumnDef<Role, unknown>[];
     tableVariants: Variants;
     dataVersion: number;
     searchTerm: string;
@@ -50,7 +50,7 @@ interface RoleTableContextType {
 }
 
 interface ExtendedRoleTableContext extends RoleTableContextType {
-    roles: RoleModel[];
+    roles: Role[];
     paginationMeta: PaginationMetaModel;
 }
 

@@ -82,12 +82,10 @@ export const EmployeeTable: React.FC = () => {
 
     const handleExportToExcel = async () => {
         if (getSelectedEmployeeIds) {
-            const selectedIds = getSelectedEmployeeIds();
-            if (selectedIds.length > 0) {
+            const selectedIds = getSelectedEmployeeIds();            if (selectedIds.length > 0) {
                 try {
                     await exportToExcel(selectedIds);
-                } catch (error) {
-                    console.error("Error al exportar los empleados:", error);
+                } catch {
                     toast.error("Error de exportación", {
                         description: "No se pudieron exportar los empleados seleccionados."
                     });
@@ -121,9 +119,7 @@ export const EmployeeTable: React.FC = () => {
         } finally {
             setLocalLoading(false);
         }
-    };
-
-    const table = useReactTable({
+    };    const table = useReactTable({
         data: employees || [],
         columns,
         state: {
@@ -142,17 +138,15 @@ export const EmployeeTable: React.FC = () => {
             const newPagination = typeof updaterOrValue === 'function'
                 ? updaterOrValue(pagination)
                 : updaterOrValue;
-
             setPagination(newPagination);
         },
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         manualPagination: true,
+        manualFiltering: true, // Deshabilitamos el filtrado automático porque ya viene del backend
         pageCount: paginationMeta?.totalPages || 0,
-    });
-
-    return (
+    });    return (
         <div className="w-full">
             <div className="flex flex-col gap-4 py-4 md:hidden">
                 <div className="w-full">
@@ -245,8 +239,7 @@ export const EmployeeTable: React.FC = () => {
                     >
                         <Table>
                             <TableHeader>
-                                {table.getHeaderGroups().map((headerGroup) => (
-                                    <TableRow key={headerGroup.id} className="bg-[#145A32] hover:bg-[#0E3D22]">
+                                {table.getHeaderGroups().map((headerGroup) => (                                    <TableRow key={headerGroup.id} className="bg-[#145A32] hover:bg-[#0E3D22]">
                                         {headerGroup.headers.map((header) => (
                                             <TableHead
                                                 key={header.id}

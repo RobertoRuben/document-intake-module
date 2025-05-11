@@ -44,9 +44,7 @@ export class EmployeeService {
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "EmployeeOperationError");
     }
-  }
-
-  /**
+  }  /**
    * Searches employees by search term
    * @param searchTerm Search term
    * @param page Page number
@@ -62,7 +60,10 @@ export class EmployeeService {
       const response = await axiosInstance.get<unknown>(
         `${this.baseEndpoint}/search?search_term=${searchTerm}&page=${page}&size=${size}`
       );
-      return camelizeKeys(response.data) as PaginatedEmployeesResponseModel;
+      
+      const camelizedData = camelizeKeys(response.data) as PaginatedEmployeesResponseModel;
+      
+      return camelizedData;
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "EmployeeOperationError");
     }

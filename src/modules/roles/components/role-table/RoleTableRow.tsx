@@ -1,11 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { TableCell } from "@/modules/core/components/ui/table";
-import { RoleModel } from "@/modules/roles/models/role.model";
+import { Role } from "@/modules/roles/models/role.model";
 import { TableActions } from "./TableActions";
 
 interface RoleTableRowProps {
-    role: RoleModel;
+    role: Role;
     index: number;
     onEdit: (id?: number) => void;
     onDelete: (id?: number) => void;

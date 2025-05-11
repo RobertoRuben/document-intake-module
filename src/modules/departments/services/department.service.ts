@@ -8,7 +8,7 @@ import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
  * Service for managing system departments
  */
 export class DepartmentService {
-  private readonly baseEndpoint = "/department";
+  private readonly baseEndpoint = "/departments";
 
   /**
    * Gets all departments
