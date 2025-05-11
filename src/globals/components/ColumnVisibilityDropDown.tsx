@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Columns } from "lucide-react";
 import { Button } from "@/modules/core/components/ui/button";
 import {
     DropdownMenu,
@@ -21,14 +21,16 @@ interface ColumnVisibilityDropdownProps {
     buttonText?: string; 
     buttonClassName?: string; 
     columnLabels?: Record<string, string>; 
+    isMobileView?: boolean;
 }
 
 export const ColumnVisibilityDropdown: React.FC<ColumnVisibilityDropdownProps> = ({ 
     columns, 
     buttonText = "Columnas",
-    buttonClassName = "w-full",
-    columnLabels = {} 
-}) => {    const getColumnLabel = (column: ColumnDefinition): string => {
+    buttonClassName = "w-full justify-between",
+    columnLabels = {},
+    isMobileView = false
+}) => {const getColumnLabel = (column: ColumnDefinition): string => {
         if (column.label) {
             return column.label;
         }
@@ -116,13 +118,15 @@ export const ColumnVisibilityDropdown: React.FC<ColumnVisibilityDropdownProps> =
             .trim();
             
         return readableLabel;
-    };
-
-    return (
+    };    return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" className={buttonClassName}>
-                    {buttonText} <ChevronDown className="ml-2 h-4 w-4" />
+                    <div className={`flex items-center gap-2 ${isMobileView ? 'justify-center w-full' : ''}`}>
+                        <Columns className="h-4 w-4" />
+                        <span className="font-semibold">{buttonText}</span>
+                    </div>
+                    <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

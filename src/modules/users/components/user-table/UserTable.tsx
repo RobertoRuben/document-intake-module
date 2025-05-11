@@ -199,8 +199,7 @@ export const UserTable: React.FC = () => {
                         </div>
                     </>
                 )}
-                
-                <div className="w-full">
+                  <div className="w-full">
                     <ColumnVisibilityDropdown
                         columns={table.getAllColumns().map((column) => ({
                             id: column.id,
@@ -208,6 +207,7 @@ export const UserTable: React.FC = () => {
                             toggleVisibility: (value) => column.toggleVisibility(value),
                             getCanHide: () => column.getCanHide(),
                         }))}
+                        isMobileView={true}
                     />
                 </div>
             </div>            <div className="hidden md:flex md:items-center md:justify-between gap-4 py-4">
@@ -245,8 +245,7 @@ export const UserTable: React.FC = () => {
                             />
                         </>
                     )}
-                    
-                    <div className="w-[200px]">
+                      <div className="w-[200px]">
                         <ColumnVisibilityDropdown
                             columns={table.getAllColumns().map((column) => ({
                                 id: column.id,
@@ -254,6 +253,7 @@ export const UserTable: React.FC = () => {
                                 toggleVisibility: (value) => column.toggleVisibility(value),
                                 getCanHide: () => column.getCanHide(),
                             }))}
+                            isMobileView={false}
                         />
                     </div>
                 </div>
