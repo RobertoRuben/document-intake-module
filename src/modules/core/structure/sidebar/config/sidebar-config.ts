@@ -1,7 +1,18 @@
 import { NavItem } from '../types/sidebar.types';
-import { Settings, Building2, Briefcase, BadgeCheck, Users, Shield } from 'lucide-react';
+import { Settings, Building2, Briefcase, BadgeCheck, Users, Shield, Map, MapPin } from 'lucide-react';
 
 export const navItems: NavItem[] = [
+    {
+        name: "Ubicaciones",
+        icon: Map,
+        subItems: [
+            {
+                name: "Centros Poblados",
+                path: "/settlements",
+                icon: MapPin
+            }
+        ]
+    },
     {
         name: "Empresa",
         icon: Briefcase,
