@@ -15,9 +15,9 @@ import {
     OnChangeFn
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/modules/core/components/ui/table";
-import { usePositionTableContext } from "../../context/position-table.context";
-import { usePositionContext } from "../../context/position.context";
-import { Position } from "@/modules/positions/model/position.model";
+import { useSettlementTableContext } from "../../context/settlement-table.context";
+import { useSettlementContext } from "../../context/settlement.context";
+import { Settlement } from "@/modules/settlements/model/settlement.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
 import { DeleteModal } from "@/globals/modals/delete-modal/DeleteModal";
 import { toast } from "sonner";
@@ -28,7 +28,7 @@ import { BulkDeleteButton } from "@/globals/components/BulkDeleteButton";
 import { ExportToExcelButton } from "@/globals/components/ExportToExcelButton";
 import { EmptyStateMessage } from "@/globals/components/EmptyStateMessage";
 
-interface PositionTableContextType {
+interface SettlementTableContextType {
     sorting: SortingState;
     setSorting: OnChangeFn<SortingState>;
     columnFilters: ColumnFiltersState;
@@ -40,18 +40,18 @@ interface PositionTableContextType {
     totalSelectedRows: number; 
     pagination: PaginationState;
     setPagination: OnChangeFn<PaginationState>;
-    columns: ColumnDef<Position, unknown>[];
+    columns: ColumnDef<Settlement, unknown>[];
     tableVariants: Variants;
     dataVersion: number;
     searchTerm: string;
     onSearchChange: (value: string) => void;
     handleBulkDelete: () => Promise<void>;
-    getSelectedPositionIds?: () => number[];
-    positions: Position[];
+    getSelectedSettlementIds?: () => number[];
+    settlements: Settlement[];
     paginationMeta: PaginationMetaModel;
 }
 
-export const PositionTable: React.FC = () => {
+export const SettlementTable: React.FC = () => {
     const [localLoading, setLocalLoading] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     
@@ -73,41 +73,41 @@ export const PositionTable: React.FC = () => {
         searchTerm,
         onSearchChange,
         handleBulkDelete,
-        getSelectedPositionIds,
-        positions,
+        getSelectedSettlementIds,
+        settlements,
         paginationMeta
-    } = usePositionTableContext() as unknown as PositionTableContextType;
+    } = useSettlementTableContext() as unknown as SettlementTableContextType;
 
-    const { handleExportToExcel: exportToExcel, isLoading } = usePositionContext();
+    const { handleExportToExcel: exportToExcel, isLoading } = useSettlementContext();
 
     const handleExportToExcel = async () => {
-        if (getSelectedPositionIds) {
-            const selectedIds = getSelectedPositionIds();
+        if (getSelectedSettlementIds) {
+            const selectedIds = getSelectedSettlementIds();
             if (selectedIds.length > 0) {
                 try {
                     await exportToExcel(selectedIds);
                 } catch (error) {
-                    console.error("Error al exportar los cargos:", error);
+                    console.error("Error al exportar los asentamientos:", error);
                     toast.error("Error de exportación", {
-                        description: "No se pudieron exportar los cargos seleccionados."
+                        description: "No se pudieron exportar los asentamientos seleccionados."
                     });
                 }
             } else {
                 toast.warning("Selección vacía", {
-                    description: "No hay cargos seleccionados para exportar"
+                    description: "No hay asentamientos seleccionados para exportar"
                 });
             }
         }
     };
 
     const handleOpenBulkDeleteModal = () => {
-        if (getSelectedPositionIds) {
-            const selectedIds = getSelectedPositionIds();
+        if (getSelectedSettlementIds) {
+            const selectedIds = getSelectedSettlementIds();
             if (selectedIds.length > 0) {
                 setIsDeleteModalOpen(true);
             } else {
                 toast.warning("Selección vacía", {
-                    description: "No hay cargos seleccionados para eliminar"
+                    description: "No hay asentamientos seleccionados para eliminar"
                 });
             }
         }
@@ -124,7 +124,7 @@ export const PositionTable: React.FC = () => {
     };
 
     const table = useReactTable({
-        data: positions || [],
+        data: settlements || [],
         columns,
         state: {
             sorting,
@@ -159,7 +159,7 @@ export const PositionTable: React.FC = () => {
                     <SearchInput
                         value={searchTerm}
                         onChange={onSearchChange}
-                        placeholder="Buscar cargos..."
+                        placeholder="Buscar asentamientos..."
                     />
                 </div>
                 
@@ -199,7 +199,7 @@ export const PositionTable: React.FC = () => {
                     <SearchInput
                         value={searchTerm}
                         onChange={onSearchChange}
-                        placeholder="Buscar cargos..."
+                        placeholder="Buscar asentamientos..."
                     />
                 </div>
                 
@@ -264,12 +264,12 @@ export const PositionTable: React.FC = () => {
                                 ))}
                             </TableHeader>
                             <TableBody>
-                                {isLoading && positions.length === 0 ? (
+                                {isLoading && settlements.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={columns.length} className="p-4 text-center">
                                             <div className="flex justify-center items-center">
                                                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
-                                                <span className="ml-2">Cargando cargos...</span>
+                                                <span className="ml-2">Cargando asentamientos...</span>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -291,7 +291,7 @@ export const PositionTable: React.FC = () => {
                                     <TableRow>
                                         <TableCell colSpan={columns.length} className="h-24">
                                             <EmptyStateMessage 
-                                                message="No se encontraron cargos"
+                                                message="No se encontraron asentamientos"
                                             />
                                         </TableCell>
                                     </TableRow>
@@ -316,7 +316,7 @@ export const PositionTable: React.FC = () => {
                         });
                     }
                 }}
-                itemName="cargo"
+                itemName="asentamiento"
             />
             
             {/* Modal de confirmación para eliminación masiva */}
@@ -324,9 +324,9 @@ export const PositionTable: React.FC = () => {
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleBulkDeleteWithLoading}
-                title="Eliminar cargos seleccionados"
+                title="Eliminar asentamientos seleccionados"
                 description={`¿Estás seguro que deseas eliminar ${totalSelectedRows} ${
-                    totalSelectedRows === 1 ? "cargo" : "cargos"
+                    totalSelectedRows === 1 ? "asentamiento" : "asentamientos"
                 } seleccionados? Esta acción no se puede deshacer.`}
                 confirmButtonText="Eliminar"
                 cancelButtonText="Cancelar"
