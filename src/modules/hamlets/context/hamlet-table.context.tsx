@@ -1,8 +1,8 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { useHamletTable } from "../hooks/use-hamlet-table.hook";
-import { useHamletContainerHook } from "../hooks/use-hamlet-container.hook";
 import { Hamlet } from "../model/hamlet.model";
 import { PaginationMetaModel } from "@/globals/models/pagination.model";
+import { useHamletContext } from "./hamlet.context";
 
 interface HamletTableContextType {
     hamlets: Hamlet[];
@@ -33,7 +33,7 @@ export const HamletTableProvider: React.FC<{ children: ReactNode }> = ({ childre
         handleSearchChange: onSearchChange,
         handlePageChange: onPageChange,
         handleDeleteMultipleHamlets
-    } = useHamletContainerHook();
+    } = useHamletContext();
 
     const tableHookProps = useHamletTable({
         hamlets,
