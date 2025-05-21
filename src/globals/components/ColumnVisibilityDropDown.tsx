@@ -80,6 +80,9 @@ export const ColumnVisibilityDropdown: React.FC<
       //Departments
       department: "Departamento",
       departmentName: "Nombre del departamento",
+      departmentCode: "Código del departamento",
+      sourceDepartmentName: "Departamento origen",
+      targetDepartmentName: "Departamento destino",
 
       //Positions
       position: "Posición",
