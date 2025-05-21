@@ -7,6 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/modules/core/components/ui/dropdown-menu";
+import { set } from "react-hook-form";
 
 interface ColumnDefinition {
   id: string;
@@ -83,6 +84,10 @@ export const ColumnVisibilityDropdown: React.FC<
       //Positions
       position: "Posición",
       positionName: "Nombre de la posición",
+
+      //Setlements
+      settlement: "Asentamiento",
+      settlementName: "Nombre del asentamiento",
 
       // Quantities
       amount: "Cantidad",
