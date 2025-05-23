@@ -1,7 +1,19 @@
 import { NavItem } from '../types/sidebar.types';
-import { Settings, Building2, Briefcase, BadgeCheck, Users, Shield, Map, MapPin, MapPinHouse, Network } from 'lucide-react';
+import { Settings, Building2, Briefcase, BadgeCheck, Users, Shield, Map, MapPin, MapPinHouse, Network, FileText, FolderTree } from 'lucide-react';
 
 export const navItems: NavItem[] = [
+
+    {
+        name: "Documentos",
+        icon: FileText,
+        subItems: [
+            {
+                name: "Categorías",
+                path: "/document-categories",
+                icon: FolderTree,
+            }
+        ]
+    },
     {
         name: "Ubicaciones",
         icon: Map,
