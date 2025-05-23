@@ -9,6 +9,7 @@ import { EmployeeRoutes } from "@/modules/employees/routes/employee.router.tsx";
 import { UserRoutes } from "@/modules/users/routes/user.router.tsx";
 import { SettlementRoutes } from "@/modules/settlements/routes/settlement.router";
 import { HamletRoutes } from "@/modules/hamlets/routes/hamlet.router";
+import { DepartmentConnectionRoutes } from "@/modules/department-connections/routes/department-connection.router.tsx";
 
 export function AppRouter() {
     return (
@@ -24,6 +25,7 @@ export function AppRouter() {
                     {UserRoutes}
                     {SettlementRoutes}
                     {HamletRoutes}
+                    {DepartmentConnectionRoutes}
                 </Route>
             </Route>
 
