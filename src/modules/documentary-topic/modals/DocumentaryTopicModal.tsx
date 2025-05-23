@@ -1,50 +1,53 @@
-import React from "react";
-import { Form } from "@/modules/core/components/ui/form";
-import { DocumentaryTopic } from "@/modules/documentary-topic/model/documentary-topic-model";
-import { DocumentaryTopicModalFooter } from "./components/documentary-topic-modal-footer/DocumentaryTopicModalFooter";
-import { DocumentaryTopicFormFields } from "./components/documentary-topic-modal-form/DocumentaryTopicModalFormFields";
-import { useDocumentaryTopicForm } from "./hooks/use-documentary-topic.hook";
-import { DocumentaryTopicFormValues } from "@/modules/documentary-topic/modals/validators/documentary-topic.validatos.schema";
+import { DocumentaryTopicModalForm } from "./components/documentary-topic-modal-form/DocumentaryTopicModalForm";
+import { DocumentaryTopic } from "../model/documentary-topic-model";
+import { useEffect, useState } from "react";
+import { Dialog } from "@radix-ui/react-dialog";
+import { DialogContent } from "@/modules/core/components/ui/dialog";
+import { DocumentaryTopicModalHeader } from "./components/documentary-topic-modal-header/DocumentaryTopicModalHeader";
 
-interface DocumentaryTopicModalFormProps {
+interface DocumentaryTopicModalProps {
+    isOpen: boolean;
     documentaryTopic?: DocumentaryTopic;
-    isEditing: boolean;
     onClose: () => void;
     onSubmit: (data: DocumentaryTopic) => Promise<boolean>;
 }
 
-export const DocumentaryTopicModalForm: React.FC<DocumentaryTopicModalFormProps> = ({
+export const DocumentaryTopicModal: React.FC<DocumentaryTopicModalProps> = ({
+    isOpen,
     documentaryTopic,
-    isEditing,
     onClose,
-    onSubmit,
+    onSubmit
 }) => {
-    const { form } = useDocumentaryTopicForm(documentaryTopic);
+    const [internalTopic, setInternalTopic] = useState<DocumentaryTopic | undefined>(documentaryTopic);
+    const isEditing = !!internalTopic;
 
-    const handleSubmit = async (values: DocumentaryTopicFormValues) => {
-        const topicData: DocumentaryTopic = {
-            id: documentaryTopic?.id || undefined,
-            name: values.name,
-        };
+    useEffect(() => {
+        if (isOpen) {
+            setInternalTopic(documentaryTopic);
+        }
+    }, [isOpen, documentaryTopic]);
 
-        const success = await onSubmit(topicData);
-        if (success) {
-            onClose();
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            setTimeout(() => {
+                onClose();
+            }, 300);
         }
     };
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="p-6">
-                <div className="mb-6">
-                    <DocumentaryTopicFormFields form={form} />
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+            <DialogContent className="max-w-md w-full p-0 overflow-hidden [&>button]:hidden max-h-[90vh]">
+                <DocumentaryTopicModalHeader isEditing={isEditing} />
+                <div className="max-h-[calc(90vh-130px)] overflow-y-auto">
+                    <DocumentaryTopicModalForm 
+                        documentaryTopic={internalTopic}
+                        isEditing={isEditing}
+                        onClose={onClose}
+                        onSubmit={onSubmit}
+                    />
                 </div>
-                <DocumentaryTopicModalFooter
-                    isEditing={isEditing}
-                    onClose={onClose}
-                    onSubmit={form.handleSubmit(handleSubmit)}
-                />
-            </form>
-        </Form>
+            </DialogContent>
+        </Dialog>
     );
 };
