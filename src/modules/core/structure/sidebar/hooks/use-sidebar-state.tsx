@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { navItems } from '../config/sidebar-config.ts';
 import { NavItem, NavSubItem } from '../types/sidebar.types';
+import { TokenCookieUtils } from '@/globals/utils/cookieUtils';
 
 export function useSidebarState(unconfirmedCount = 0) {
     const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
-    const userRole = sessionStorage.getItem('rolName') || '';
+    const userRole = TokenCookieUtils.getUserRole();
     
     const toggleMenu = (name: string) => {
         setOpenMenus((prev) => ({ ...prev, [name]: !prev[name] }));
