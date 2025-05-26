@@ -1,7 +1,7 @@
 import axiosInstance from "@/globals/config/axios-config";
 import { AuthRequestModel } from "../models/auth.request.model";
 import { AuthResponseModel } from "../models/auth.response.model";
-import { camelizeKeys, decamelizeKeys } from "humps";
+import { camelizeKeys } from "humps";
 import { ApiErrorHandler } from "@/globals/exceptions/api-error.handler";
 
 /**
@@ -36,13 +36,11 @@ export class AuthService {
     } catch (error) {
       throw ApiErrorHandler.handleApiError(error, "AuthOperationError");
     }
-  }
-
-  /**
+  }  /**
    * Refreshes the access token using refreshToken
+   * @param showAlert Whether to show an alert when token expires
    * @returns New access token
-   */
-  async refreshToken(): Promise<AuthResponseModel> {
+   */  async refreshToken(showAlert: boolean = false): Promise<AuthResponseModel> {
     try {
       const refreshToken = sessionStorage.getItem("refreshToken");
 
@@ -50,9 +48,25 @@ export class AuthService {
         throw new Error("No refresh token available");
       }
 
-      const payload = decamelizeKeys({ refreshToken });
+      // Show alert if requested
+      if (showAlert) {
+        const userConfirmed = window.confirm(
+          "Su sesión ha expirado. Presione OK para renovar su sesión automáticamente."
+        );
+        if (!userConfirmed) {
+          this.logout();
+          throw new Error("Token refresh cancelled by user");
+        }
+      }
 
-      const response = await axiosInstance.post<unknown>(`${this.baseEndpoint}/refresh`, payload);
+      // Send refresh_token as query parameter (backend expects it as URL parameter)
+      const url = `${this.baseEndpoint}/refresh?refresh_token=${encodeURIComponent(refreshToken)}`;
+
+      const response = await axiosInstance.post<unknown>(url, {}, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const camelCaseResponse = camelizeKeys(response.data) as AuthResponseModel;
 
@@ -60,7 +74,7 @@ export class AuthService {
       sessionStorage.setItem("refreshToken", camelCaseResponse.refreshToken);
 
       return camelCaseResponse;
-    } catch (error) {
+    } catch (error: unknown) {
       throw ApiErrorHandler.handleApiError(error, "AuthOperationError");
     }
   }
@@ -92,6 +106,28 @@ export class AuthService {
    */
   isAuthenticated(): boolean {
     return Boolean(sessionStorage.getItem("accessToken"));
+  }
+
+  /**
+   * Checks if the access token is about to expire (within 5 minutes)
+   * @returns True if token will expire soon
+   */
+  isTokenNearExpiry(): boolean {
+    try {
+      const accessToken = sessionStorage.getItem("accessToken");
+      if (!accessToken) return false;
+      
+      // Decode JWT payload (without verification, just for reading)
+      const payload = JSON.parse(atob(accessToken.split('.')[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+      const expirationTime = payload.exp;
+      
+      // Check if token expires within 5 minutes (300 seconds)
+      return (expirationTime - currentTime) < 300;
+    } catch (error) {
+      console.warn("⚠️ Error al verificar expiración del token:", error);
+      return false;
+    }
   }
 }
 

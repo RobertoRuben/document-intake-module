@@ -24,16 +24,17 @@ export class ApiErrorHandler {
    * @param error Captured error
    * @param errorClassName Optional: custom name for the error class
    * @throws AppOperationError with the processed error information
-   */
-  static handleApiError(error: unknown, errorClassName?: string): never {
+   */  static handleApiError(error: unknown, errorClassName?: string): never {
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError;
+      
       interface ErrorResponse {
         detail?: {
           details?: string;
           message?: string;
           code?: number;
         };
+        message?: string; // Sometimes the message is directly in the response
       }
       const responseData = axiosError.response?.data as ErrorResponse;
 
@@ -47,6 +48,21 @@ export class ApiErrorHandler {
           errorDetail.message || "Operation error",
           code,
           details
+        );
+        
+        if (errorClassName) {
+          appError.name = errorClassName;
+        }
+        
+        throw appError;
+      }
+
+      // Handle direct message in response data (common for 403 errors)
+      if (responseData?.message) {
+        const appError = new AppOperationError(
+          responseData.message,
+          axiosError.response?.status || 500,
+          responseData.message
         );
         
         if (errorClassName) {
