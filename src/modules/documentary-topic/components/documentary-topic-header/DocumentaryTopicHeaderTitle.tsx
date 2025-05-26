@@ -1,0 +1,9 @@
+import React from "react";
+
+export const DocumentaryTopicHeaderTitle: React.FC = () => {
+    return (
+        <h2 className="text-2xl font-bold text-gray-800 mb-2 sm:mb-0 text-center sm:text-left">
+            Ambitos Documentales
+        </h2>
+    );
+};

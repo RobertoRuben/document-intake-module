@@ -1,5 +1,5 @@
 import { NavItem } from '../types/sidebar.types';
-import { Settings, Building2, Briefcase, BadgeCheck, Users, Shield, Map, MapPin, MapPinHouse, Network, FileText, FolderTree } from 'lucide-react';
+import { Settings, Building2, Briefcase, BadgeCheck, Users, Shield, Map, MapPin, MapPinHouse, Network, FileText, FolderTree, BookOpen } from 'lucide-react';
 
 export const navItems: NavItem[] = [
 
@@ -11,7 +11,12 @@ export const navItems: NavItem[] = [
                 name: "Categorías",
                 path: "/document-categories",
                 icon: FolderTree,
-            }
+            },
+            {
+                name: "Ambitos Documentales",
+                path: "/documentary-topics",
+                icon: BookOpen,
+            },
         ]
     },
     {

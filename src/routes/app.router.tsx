@@ -11,6 +11,7 @@ import { SettlementRoutes } from "@/modules/settlements/routes/settlement.router
 import { HamletRoutes } from "@/modules/hamlets/routes/hamlet.router";
 import { DepartmentConnectionRoutes } from "@/modules/department-connections/routes/department-connection.router.tsx";
 import { DocumentCategoryRoutes } from "@/modules/document-categories/routes/document-category.router";
+import { DocumentaryTopicRoutes } from "@/modules/documentary-topic/routes/documentary-topic.router";
 
 export function AppRouter() {
     return (
@@ -28,6 +29,7 @@ export function AppRouter() {
                     {HamletRoutes}
                     {DepartmentConnectionRoutes}
                     {DocumentCategoryRoutes}
+                    {DocumentaryTopicRoutes}
                 </Route>
             </Route>
 
