@@ -1,4 +1,4 @@
-import { Menu } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight } from 'lucide-react';
 import { NotificationMenu } from './components/NotificationMenu';
 import { UserMenu } from './components/UserMenu';
 import { useHeaderDropdownsHook } from './hooks/use-header-dropdowns.hook.ts';
@@ -9,6 +9,8 @@ interface HeaderProps {
   notificationCount: number;
   onViewNotifications: () => void;
   onModalStateChange: (isOpen: boolean) => void;
+  onToggleSidebarCollapsed: () => void;
+  isSidebarCollapsed: boolean;
 }
 
 export function Header({
@@ -16,7 +18,9 @@ export function Header({
   title,
   notificationCount,
   onViewNotifications,
-  onModalStateChange
+  onModalStateChange,
+  onToggleSidebarCollapsed,
+  isSidebarCollapsed
 }: HeaderProps) {
   const { openDropdown, toggleDropdown } = useHeaderDropdownsHook();
 
@@ -41,6 +45,18 @@ export function Header({
           aria-label="Abrir menú"
         >
           <Menu className="h-6 w-6" strokeWidth={3} />
+        </button>
+        <button
+          onClick={onToggleSidebarCollapsed}
+          className="hidden lg:inline-flex items-center justify-center mr-3 rounded-md border border-white/10 px-2 py-1 text-sm hover:bg-white/10 transition-colors"
+          aria-label={isSidebarCollapsed ? 'Mostrar sidebar' : 'Ocultar sidebar'}
+          title={isSidebarCollapsed ? 'Mostrar sidebar' : 'Ocultar sidebar'}
+        >
+          {isSidebarCollapsed ? (
+            <ChevronRight className="h-5 w-5" strokeWidth={3} />
+          ) : (
+            <ChevronLeft className="h-5 w-5" strokeWidth={3} />
+          )}
         </button>
         <div className="text-xl font-medium">{title}</div>
       </div>

@@ -2,11 +2,11 @@ import { SidebarProps } from './types/sidebar.types';
 import { SidebarOverlay } from './components/SidebarOverlay';
 import { SidebarContainer } from './components/SidebarContainer';
 
-export function Sidebar({ isOpen, onClose, unconfirmedCount = 0 }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, unconfirmedCount = 0, isCollapsed }: SidebarProps) {
     return (
         <>
             <SidebarOverlay isOpen={isOpen} onClose={onClose} />
-            <SidebarContainer isOpen={isOpen} onClose={onClose} unconfirmedCount={unconfirmedCount} />
+            <SidebarContainer isOpen={isOpen} onClose={onClose} unconfirmedCount={unconfirmedCount} isCollapsed={isCollapsed} />
         </>
     );
 }

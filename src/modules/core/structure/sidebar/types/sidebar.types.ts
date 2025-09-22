@@ -19,4 +19,6 @@ export type SidebarProps = {
     isOpen: boolean;
     onClose: () => void;
     unconfirmedCount?: number;
+    // When true, the sidebar should be hidden on desktop (lg+) while preserving mobile behavior
+    isCollapsed?: boolean;
 };

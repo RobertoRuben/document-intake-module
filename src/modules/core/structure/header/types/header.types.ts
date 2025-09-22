@@ -6,6 +6,8 @@ export type HeaderProps = {
     notificationCount: number;
     onViewNotifications: () => void;
     onModalStateChange: (isOpen: boolean) => void;
+    onToggleSidebarCollapsed: () => void;
+    isSidebarCollapsed: boolean;
 };
 
 import { DropdownType } from '../hooks/use-header-dropdowns.hook.ts';

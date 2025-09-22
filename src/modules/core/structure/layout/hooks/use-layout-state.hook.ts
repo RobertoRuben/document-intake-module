@@ -4,6 +4,8 @@ import { useLoadingSpinnerContextHook } from "../../loading-spinner/hooks/use-lo
 
 export function useLayoutStateHook() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Controls whether the sidebar is collapsed on desktop (lg+)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   const [unconfirmedCount, setUnconfirmedCount] = useState(0);
@@ -28,9 +30,14 @@ export function useLayoutStateHook() {
 
   const headerTitle = location.pathname === "/inicio" ? "Bienvenido" : "SGDOC";
 
+  const toggleSidebarCollapsed = () => setSidebarCollapsed(prev => !prev);
+
   return {
     sidebarOpen,
     setSidebarOpen,
+    sidebarCollapsed,
+    setSidebarCollapsed,
+    toggleSidebarCollapsed,
     modalOpen,
     setModalOpen,
     notificationCount,

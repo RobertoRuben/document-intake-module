@@ -13,6 +13,8 @@ export function Layout() {
   const {
     sidebarOpen,
     setSidebarOpen,
+    sidebarCollapsed,
+    toggleSidebarCollapsed,
     modalOpen,
     setModalOpen,
     notificationCount,
@@ -32,6 +34,7 @@ export function Layout() {
             isOpen={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
             unconfirmedCount={unconfirmedCount}
+            isCollapsed={sidebarCollapsed}
         />
 
         <div className="flex-1 flex flex-col min-w-0">
@@ -41,6 +44,8 @@ export function Layout() {
               notificationCount={notificationCount}
               onViewNotifications={handleViewNotifications}
               onModalStateChange={setModalOpen}
+              onToggleSidebarCollapsed={toggleSidebarCollapsed}
+              isSidebarCollapsed={sidebarCollapsed}
           />
 
           <MainContent>
